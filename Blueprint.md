@@ -2,6 +2,19 @@
 
 Prepared for the Paris AI Innovate hackathon, 22 October 2026. This is a proposed implementation and evaluation plan, not a completed application or a validated food-safety system. The builder is solo; remaining time is unspecified. Relative time budgets below are planning assumptions.
 
+## Latest stack change — no Vercel sponsor credits
+
+This section supersedes older Gateway, storage and voice choices below. Preserve the existing working Next.js application, Aiven database, GitHub repository, Dockerfile and tests. The builder reports a working rule-based three-kitchen flow, private photo storage in PostgreSQL, and passing local/container checks; Aiven Runtime deployment still needs verification and a real AI investigation still needs implementation.
+
+- Use Lovable for a scoped interface prototype. Export the relevant React design/components and have Claude Code adapt them to the existing Next.js application. Keep existing routes, authentication, case-state contracts and tests. Do not treat sample UI records as live data or replace the existing repository wholesale.
+- Use the Anthropic API directly for application investigation and image interpretation, with a server-side ANTHROPIC_API_KEY from the credited Console organization. Check the remaining balance; coding and application API usage may share it. The AI SDK with @ai-sdk/anthropic can call the provider directly without AI Gateway. Select an available model explicitly and test it.
+- Host the submitted application on Aiven Runtime and keep Aiven PostgreSQL as the canonical data layer. Lovable preview hosting does not replace that requirement.
+- Keep current PostgreSQL photo storage for the small demo. Do not introduce Supabase storage now. Continue deferring voice until the core agent and deployment work.
+- Redeem the Lovable offer and inspect its actual credit coverage. Built-in Lovable app AI is a separate implementation route; do not assume those credits are an API key usable by the existing external application. If the organizers specifically require Lovable's runtime AI rather than its builder, inspect that integration before switching execution paths.
+- Lovable Git sync creates a separate repository. Current GitHub documentation also describes ZIP Upload code as a separate import path; do not assume this preserves the existing Next.js server and deployment unchanged. Under the short deadline, use a design prototype and targeted port instead of a full migration.
+
+References: https://docs.lovable.dev/integrations/github ; https://docs.lovable.dev/features/ai ; https://docs.lovable.dev/introduction/credits-and-usage ; https://ai-sdk.dev/providers/ai-sdk-providers/anthropic
+
 ## Mandatory correction after reviewing the official challenge PDF
 
 The official challenge requires deployment of the app to Aiven Runtime. Aiven PostgreSQL remains the canonical data layer. Vercel AI Gateway remains the model gateway, but Vercel is no longer the planned app host. This correction supersedes the earlier chat instructions about Vercel hosting.
