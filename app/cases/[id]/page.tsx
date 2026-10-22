@@ -11,8 +11,11 @@ import { getCaseDetail } from "@/lib/cases";
 import { REASON_TEXT, type Evaluation, type ReasonCode } from "@/lib/matching/evaluate";
 import { normalizeGtin } from "@/lib/matching/normalize";
 import type { RecallScope } from "@/lib/recalls/scope";
+import { InvestigationRuns } from "@/components/investigation-runs";
+import { LabelEvidence } from "@/components/label-evidence";
+import { AI_MODEL, aiConfigured } from "@/lib/ai/client";
 import {
-  confirmReadingAction, investigateAction, managerUploadAction, markReviewedAction, requestStaffCheckAction,
+  aiInvestigateAction, investigateAction, managerUploadAction, markReviewedAction, requestStaffCheckAction,
 } from "../../actions";
 
 export default function CasePage({ params }: PageProps<"/cases/[id]">) {
@@ -56,6 +59,7 @@ async function CaseWorkspace({ params }: { params: Promise<{ id: string }> }) {
   const caseGtin = normalizeGtin(c.gtin_raw);
   const openRequest = requests.find((r) => r.status === "OPEN");
   const kitchenLink = `/kitchen/${createParticipantToken(c.site_id)}`;
+  const aiAvailable = aiConfigured();
   const showKitchenLink = c.response_status !== "NOT_REQUESTED" || openRequest;
   const hidden = (extra: Record<string, string | number> = {}) =>
     Object.entries({ caseId: c.id, ...extra }).map(([k, v]) => <input key={k} type="hidden" name={k} value={v} />);
@@ -145,25 +149,23 @@ async function CaseWorkspace({ params }: { params: Promise<{ id: string }> }) {
             <p className="mt-2 text-xs text-slate-500">A historical delivery does not prove the product is still in stock.</p>
           </Card>
 
-          <Card title="Investigation runs" icon={<FileSearch className="size-4" aria-hidden />}>
-            <ActionForm action={investigateAction} submitLabel="Run investigation" pendingLabel="Investigating…" variant="secondary">
-              {hidden()}
-            </ActionForm>
+          <Card title="Investigation" icon={<FileSearch className="size-4" aria-hidden />}>
+            <div className="flex flex-wrap gap-2">
+              {aiAvailable && (
+                <ActionForm action={aiInvestigateAction} submitLabel="Run AI investigation" pendingLabel="AI investigating…" className="">
+                  {hidden()}
+                </ActionForm>
+              )}
+              <ActionForm action={investigateAction} submitLabel="Rule-based check (no AI)" pendingLabel="Checking…" variant="secondary" className="">
+                {hidden()}
+              </ActionForm>
+            </div>
             <p className="mt-2 text-xs text-slate-500">
-              Bounded rule-based run (max 6 steps). Model-assisted label extraction is not enabled yet; a person reads
-              and confirms label values.
+              {aiAvailable
+                ? `The AI investigator (${AI_MODEL}) chooses allowlisted tools, at most 8 per segment within 120 s. The deterministic matcher decides status; extracted label values need human confirmation. It resumes automatically after a photo upload or confirmation.`
+                : "AI investigation is unavailable on this server (no API key configured). The rule-based check still works and is labelled as such."}
             </p>
-            {runs.map((r) => (
-              <div key={r.id} className="mt-4 rounded-md border border-slate-100 p-3 text-sm">
-                <p className="font-medium">{r.status} · {r.method} · {fmt(r.started_at)}</p>
-                <ol className="mt-1 list-decimal pl-5 text-xs text-slate-600">
-                  {r.steps.map((s: { step_index: number; tool_name: string; elapsed_ms: number }) => (
-                    <li key={s.step_index}><span className="font-mono">{s.tool_name}</span> · {s.elapsed_ms} ms</li>
-                  ))}
-                </ol>
-                {r.summary && <p className="mt-1 text-xs">{r.summary}</p>}
-              </div>
-            ))}
+            <InvestigationRuns runs={runs} />
           </Card>
         </div>
 
@@ -179,30 +181,8 @@ async function CaseWorkspace({ params }: { params: Promise<{ id: string }> }) {
             )}
 
             {documents.map((d) => (
-              <div key={d.id} className="mt-4 space-y-2 border-t border-slate-100 pt-4">
-                {/* eslint-disable-next-line @next/next/no-img-element -- private, authenticated image route */}
-                <img src={`/api/documents/${d.id}`} alt="Uploaded label photo" className="w-full rounded-md ring-1 ring-slate-200" />
-                <p className="text-xs text-slate-500">Uploaded by {d.uploaded_by} · {fmt(d.created_at)} · {Math.round(d.byte_size / 1024)} KB</p>
-                {d.confirmed ? (
-                  <ul className="text-sm">
-                    {evidence.filter((e) => e.document_id === d.id).map((e) => (
-                      <li key={e.id}>Confirmed {e.field_name.replace("_", "-")}: <span className="font-mono">{e.raw_value}</span> by {e.confirmed_by}</li>
-                    ))}
-                  </ul>
-                ) : (
-                  <ActionForm action={confirmReadingAction} submitLabel="Confirm reading & reassess" pendingLabel="Reassessing…">
-                    {hidden({ documentId: d.id, version: c.version })}
-                    <p className="text-sm font-medium">Read the label in the photo and type exactly what it shows:</p>
-                    <div className="grid grid-cols-2 gap-2">
-                      <label className="text-sm">Lot code<input name="lot" className="mt-1 block w-full rounded-md border border-slate-300 px-2 py-1 font-mono" /></label>
-                      <label className="text-sm">Best before (DD/MM/YYYY)<input name="bestBefore" placeholder="10/12/2026" className="mt-1 block w-full rounded-md border border-slate-300 px-2 py-1 font-mono" /></label>
-                    </div>
-                    <label className="flex items-start gap-2 text-sm">
-                      <input type="checkbox" name="attest" required className="mt-1" /> I read these values from this photo myself.
-                    </label>
-                  </ActionForm>
-                )}
-              </div>
+              <LabelEvidence key={d.id} doc={d} caseId={c.id} version={c.version} aiAvailable={aiAvailable}
+                items={evidence.filter((e) => e.document_id === d.id)} />
             ))}
 
             <details className="mt-4 border-t border-slate-100 pt-3 text-sm">

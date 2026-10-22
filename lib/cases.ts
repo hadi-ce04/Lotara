@@ -16,8 +16,9 @@ export class CaseError extends Error {}
 
 const MAX_INVESTIGATION_STEPS = 6;
 const MAX_UPLOAD_BYTES = 4 * 1024 * 1024;
+const MAX_PHOTOS_PER_CASE = 5;
 
-async function logEvent(
+export async function logEvent(
   client: PoolClient,
   e: { tenantId: string; caseId: string | null; type: string; source: string; actorId: string; payload?: object; idempotencyKey?: string },
 ) {
@@ -30,11 +31,12 @@ async function logEvent(
 
 // ---------------------------------------------------------------- assessment
 
-type CaseContext = {
+export type CaseContext = {
   caseId: string;
   version: number;
   matchStatus: MatchStatus;
   responseStatus: ResponseStatus;
+  evaluation: Evaluation;
   siteId: string;
   noticeId: string;
   deliveryRef: string;
@@ -43,9 +45,9 @@ type CaseContext = {
   evidence: ConfirmedEvidence;
 };
 
-async function loadCaseContext(client: PoolClient, tenantId: string, caseId: string, lock: boolean): Promise<CaseContext> {
+export async function loadCaseContext(client: PoolClient, tenantId: string, caseId: string, lock: boolean): Promise<CaseContext> {
   const { rows } = await client.query(
-    `SELECT c.id, c.version, c.match_status, c.response_status, c.site_id, r.normalized_scope, r.source_id,
+    `SELECT c.id, c.version, c.match_status, c.response_status, c.evaluation, c.site_id, r.normalized_scope, r.source_id,
             l.gtin_raw, l.lot_raw, l.best_before_raw, l.source_ref
        FROM cases c JOIN recall_versions r ON r.id = c.recall_version_id JOIN received_lots l ON l.id = c.received_lot_id
       WHERE c.tenant_id = $1 AND c.id = $2 ${lock ? "FOR UPDATE OF c" : ""}`,
@@ -62,6 +64,7 @@ async function loadCaseContext(client: PoolClient, tenantId: string, caseId: str
     version: row.version,
     matchStatus: row.match_status,
     responseStatus: row.response_status,
+    evaluation: row.evaluation,
     siteId: row.site_id,
     noticeId: row.source_id,
     deliveryRef: row.source_ref,
@@ -72,8 +75,19 @@ async function loadCaseContext(client: PoolClient, tenantId: string, caseId: str
 }
 
 /** Re-evaluates a locked case and writes the result with an optimistic version check. */
-async function reassess(client: PoolClient, tenantId: string, ctx: CaseContext, actorId: string, trigger: string) {
+/** Key-order-independent JSON, so values read back from jsonb compare equal. */
+function stableJson(value: unknown): string {
+  if (Array.isArray(value)) return `[${value.map(stableJson).join(",")}]`;
+  if (value && typeof value === "object") {
+    return `{${Object.keys(value).sort().map((k) => `${JSON.stringify(k)}:${stableJson((value as Record<string, unknown>)[k])}`).join(",")}}`;
+  }
+  return JSON.stringify(value ?? null);
+}
+
+export async function reassess(client: PoolClient, tenantId: string, ctx: CaseContext, actorId: string, trigger: string) {
   const evaluation = evaluateMatch(ctx.scope, ctx.recalled, ctx.evidence);
+  // Unchanged results are not rewritten, so repeated checks don't invalidate open forms.
+  if (stableJson(evaluation) === stableJson(ctx.evaluation)) return evaluation;
   const updated = await client.query(
     `UPDATE cases SET match_status = $1, reason_codes = $2, evaluation = $3, version = version + 1, updated_at = now()
       WHERE tenant_id = $4 AND id = $5 AND version = $6`,
@@ -94,9 +108,10 @@ async function reassess(client: PoolClient, tenantId: string, ctx: CaseContext, 
 /** Deletes one tenant's records only, children before parents. */
 export async function clearTenant(client: PoolClient, tenantId: string) {
   await client.query(`DELETE FROM run_steps WHERE run_id IN (SELECT id FROM investigation_runs WHERE tenant_id = $1)`, [tenantId]);
+  await client.query(`UPDATE evidence_items SET extraction_id = NULL WHERE tenant_id = $1`, [tenantId]);
   for (const table of [
     "event_log", "staff_reports", "contact_attempts", "investigation_runs", "evidence_items",
-    "evidence_requests", "documents", "cases", "received_lots", "recall_versions", "sites",
+    "evidence_requests", "label_extractions", "documents", "cases", "received_lots", "recall_versions", "sites",
   ]) {
     await client.query(`DELETE FROM ${table} WHERE tenant_id = $1`, [tenantId]);
   }
@@ -273,7 +288,7 @@ export async function investigateCase(tenantId: string, caseId: string, actorId:
 
 const titleCase = (s: string) => s.replace(/(^|\s)\p{L}/gu, (m) => m.toUpperCase());
 
-function buildEvidenceRequest(ctx: CaseContext, evaluation: Evaluation, documents: number): string {
+export function buildEvidenceRequest(ctx: CaseContext, evaluation: Evaluation, documents: number): string {
   const gtin = ctx.recalled.gtinRaw ?? "unknown";
   const norm = normalizeGtin(gtin);
   const fields = evaluation.missingFields
@@ -313,6 +328,8 @@ export async function uploadLabelPhoto(
   return withTransaction(async (client) => {
     const ctx = await loadCaseContext(client, scope.tenantId, caseId, true);
     if (scope.siteId && ctx.siteId !== scope.siteId) throw new CaseError("Case not found");
+    const count = await client.query(`SELECT count(*)::int AS n FROM documents WHERE case_id = $1`, [caseId]);
+    if (count.rows[0].n >= MAX_PHOTOS_PER_CASE) throw new CaseError(`This case already has ${MAX_PHOTOS_PER_CASE} photos; ask the manager before sending more`);
     const doc = await client.query(
       `INSERT INTO documents (tenant_id, site_id, case_id, mime_type, byte_size, sha256, content, uploaded_by)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
@@ -332,6 +349,7 @@ export async function confirmLabelReading(
   actorId: string,
   input: { caseId: string; documentId: string; expectedVersion: number; lot: string; bestBefore: string },
 ) {
+  // If the photo was transcribed by the model, record whether the person accepted or corrected each value.
   const lot = normalizeLot(input.lot);
   const bestBefore = normalizeLot(input.bestBefore);
   if (!lot && !bestBefore) throw new CaseError("Enter at least the lot code read from the label");
@@ -343,12 +361,20 @@ export async function confirmLabelReading(
     if (!doc.rows[0]) throw new CaseError("Photo not found for this case");
     const already = await client.query(`SELECT 1 FROM evidence_items WHERE document_id = $1`, [input.documentId]);
     if (already.rows[0]) throw new CaseError("This photo has already been read and confirmed");
+    const x = await client.query(`SELECT id, fields FROM label_extractions WHERE document_id = $1 AND status = 'COMPLETED'`, [input.documentId]);
+    const extraction = x.rows[0] as { id: string; fields: { lot_text: string | null; best_before_text: string | null } } | undefined;
     for (const [field, value] of [["lot", lot], ["best_before", bestBefore]] as const) {
       if (!value) continue;
+      const extracted = extraction ? (field === "lot" ? extraction.fields.lot_text : extraction.fields.best_before_text) : null;
+      const method = !extraction
+        ? "human_reading_of_photo"
+        : extracted !== null && extracted.trim() === value
+          ? "ai_extraction_confirmed_by_human"
+          : "human_corrected_ai_extraction";
       const item = await client.query(
-        `INSERT INTO evidence_items (tenant_id, case_id, document_id, field_name, raw_value, extraction_method, confirmed_by)
-         VALUES ($1, $2, $3, $4, $5, 'human_reading_of_photo', $6) RETURNING id`,
-        [tenantId, input.caseId, input.documentId, field, value, actorId],
+        `INSERT INTO evidence_items (tenant_id, case_id, document_id, field_name, raw_value, extraction_method, confirmed_by, extraction_id)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
+        [tenantId, input.caseId, input.documentId, field, value, method, actorId, extraction?.id ?? null],
       );
       ctx.evidence.push({ field, value, evidenceId: item.rows[0].id });
     }
@@ -456,6 +482,12 @@ export async function getOverview(tenantId: string) {
 
 export async function getCaseDetail(tenantId: string, caseId: string) {
   const pool = getPool();
+  // A segment killed with its process stays RUNNING; close it once its deadline has clearly passed.
+  await pool.query(
+    `UPDATE investigation_runs SET status = 'FAILED', error_category = 'stale', finished_at = now()
+      WHERE tenant_id = $1 AND case_id = $2 AND status = 'RUNNING' AND deadline_at < now() - interval '30 seconds'`,
+    [tenantId, caseId],
+  );
   const { rows } = await pool.query(
     `SELECT c.*, s.name AS site_name, s.city, s.contact_name,
             l.supplier, l.product_name_raw, l.gtin_raw, l.lot_raw, l.best_before_raw, l.received_at, l.quantity, l.unit, l.source_ref, l.synthetic,
@@ -470,14 +502,17 @@ export async function getCaseDetail(tenantId: string, caseId: string) {
   if (!rows[0]) return null;
   const [documents, evidence, requests, reports, runs, events] = await Promise.all([
     pool.query(`SELECT d.id, d.mime_type, d.byte_size, d.uploaded_by, d.created_at,
-                       EXISTS (SELECT 1 FROM evidence_items e WHERE e.document_id = d.id) AS confirmed
-                  FROM documents d WHERE d.tenant_id = $1 AND d.case_id = $2 ORDER BY d.created_at`, [tenantId, caseId]),
+                       EXISTS (SELECT 1 FROM evidence_items e WHERE e.document_id = d.id) AS confirmed,
+                       x.id AS extraction_id, x.status AS extraction_status, x.fields AS extraction, x.model_id AS extraction_model,
+                       x.error_category AS extraction_error, x.elapsed_ms AS extraction_ms
+                  FROM documents d LEFT JOIN label_extractions x ON x.document_id = d.id
+                 WHERE d.tenant_id = $1 AND d.case_id = $2 ORDER BY d.created_at`, [tenantId, caseId]),
     pool.query(`SELECT * FROM evidence_items WHERE tenant_id = $1 AND case_id = $2 ORDER BY created_at`, [tenantId, caseId]),
     pool.query(`SELECT * FROM evidence_requests WHERE tenant_id = $1 AND case_id = $2 ORDER BY created_at DESC`, [tenantId, caseId]),
     pool.query(`SELECT * FROM staff_reports WHERE tenant_id = $1 AND case_id = $2 ORDER BY reported_at DESC`, [tenantId, caseId]),
     pool.query(`SELECT r.*, COALESCE(json_agg(s ORDER BY s.step_index) FILTER (WHERE s.id IS NOT NULL), '[]') AS steps
                   FROM investigation_runs r LEFT JOIN run_steps s ON s.run_id = r.id
-                 WHERE r.tenant_id = $1 AND r.case_id = $2 GROUP BY r.id ORDER BY r.started_at DESC LIMIT 3`, [tenantId, caseId]),
+                 WHERE r.tenant_id = $1 AND r.case_id = $2 GROUP BY r.id ORDER BY r.started_at DESC LIMIT 5`, [tenantId, caseId]),
     pool.query(`SELECT * FROM event_log WHERE tenant_id = $1 AND case_id = $2 ORDER BY occurred_at DESC, id DESC`, [tenantId, caseId]),
   ]);
   return {

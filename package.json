@@ -12,14 +12,17 @@
     "db:migrate": "tsx --env-file=.env.local scripts/migrate.ts",
     "test": "vitest run",
     "setup:secrets": "tsx scripts/setup-secrets.ts",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "ai:smoke": "tsx --env-file=.env.local scripts/ai-smoke.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^1.1.0",
     "lucide-react": "^1.61.0",
     "next": "16.4.2",
     "pg": "^8.23.1",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@playwright/test": "^1.64.1",

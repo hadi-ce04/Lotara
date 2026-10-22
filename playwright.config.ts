@@ -10,7 +10,7 @@ const port = 3200;
 
 export default defineConfig({
   testDir: "e2e",
-  timeout: 90_000,
+  timeout: process.env.E2E_AI === "1" ? 300_000 : 90_000,
   use: { baseURL: process.env.E2E_BASE_URL ?? `http://localhost:${port}`, trace: "retain-on-failure" },
   webServer: process.env.E2E_BASE_URL
     ? undefined
@@ -21,6 +21,8 @@ export default defineConfig({
         reuseExistingServer: false,
         env: {
           DEMO_TENANT_ID: "e2e",
+          // AI is off unless E2E_AI=1 (real, billed model calls).
+          ...(process.env.E2E_AI === "1" ? {} : { ANTHROPIC_API_KEY: "" }),
           DEMO_ADMIN_PASSWORD_HASH: hashPassword(password),
           SESSION_SECRET: randomBytes(32).toString("base64url"),
           PARTICIPANT_TOKEN_SECRET: randomBytes(32).toString("base64url"),

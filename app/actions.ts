@@ -2,6 +2,10 @@
 
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
+import { after } from "next/server";
+import { aiConfigured, AiUnavailableError } from "@/lib/ai/client";
+import { extractLabel } from "@/lib/ai/extract";
+import { runAiInvestigation } from "@/lib/ai/investigate";
 import {
   endManagerSession, getManager, startManagerSession, verifyParticipantToken, verifyPassword,
 } from "@/lib/auth";
@@ -10,6 +14,7 @@ import {
   CaseError, confirmLabelReading, investigateCase, markReviewed, requestStaffCheck, resetDemo,
   submitStaffReport, uploadLabelPhoto, type StaffAction,
 } from "@/lib/cases";
+import { getPool } from "@/lib/db";
 
 export type ActionState = { error?: string; ok?: string } | null;
 
@@ -64,11 +69,55 @@ export async function resetDemoAction(): Promise<ActionState> {
   });
 }
 
+const AI_ACTOR = "ai-investigator";
+
+/** Starts an AI segment after the response is sent; failures are persisted on the run. */
+function resumeAiLater(tenantId: string, caseId: string, trigger: "evidence_uploaded" | "evidence_confirmed") {
+  if (!aiConfigured()) return;
+  after(async () => {
+    try {
+      await runAiInvestigation(tenantId, caseId, AI_ACTOR, trigger);
+    } catch (err) {
+      // e.g. a segment is already running; nothing to change.
+      console.error("AI resume skipped:", err instanceof Error ? err.message.slice(0, 80) : "unknown");
+    }
+  });
+}
+
 export async function investigateAction(_: ActionState, form: FormData): Promise<ActionState> {
   return run(async () => {
     const m = await manager();
     const result = await investigateCase(m.tenantId, str(form, "caseId"), m.actorId);
-    return result.status === "NEEDS_EVIDENCE" ? "Investigation stopped: evidence requested" : "Investigation completed";
+    return result.status === "NEEDS_EVIDENCE" ? "Rule-based check: evidence requested" : "Rule-based check completed";
+  });
+}
+
+export async function aiInvestigateAction(_: ActionState, form: FormData): Promise<ActionState> {
+  return run(async () => {
+    const m = await manager();
+    try {
+      const r = await runAiInvestigation(m.tenantId, str(form, "caseId"), m.actorId, "manual");
+      if (r.status === "FAILED") throw new CaseError(`AI investigation did not finish (${r.errorCategory}). Steps so far are saved.`);
+      return r.status === "NEEDS_EVIDENCE" ? "AI investigation: evidence still needed" : "AI investigation completed";
+    } catch (err) {
+      if (err instanceof AiUnavailableError) throw new CaseError(`AI investigation unavailable (${err.category}). Use the rule-based check instead.`);
+      throw err;
+    }
+  });
+}
+
+export async function extractLabelAction(_: ActionState, form: FormData): Promise<ActionState> {
+  return run(async () => {
+    const m = await manager();
+    if (!aiConfigured()) throw new CaseError("AI extraction unavailable (not configured). Read the label manually.");
+    const docId = str(form, "documentId");
+    const caseId = str(form, "caseId");
+    const { rows } = await getPool().query(`SELECT 1 FROM documents WHERE tenant_id = $1 AND id = $2 AND case_id = $3`, [m.tenantId, docId, caseId]);
+    if (!rows[0]) throw new CaseError("Photo not found for this case");
+    await getPool().query(`DELETE FROM label_extractions WHERE tenant_id = $1 AND document_id = $2 AND status = 'FAILED'`, [m.tenantId, docId]);
+    const x = await extractLabel(m.tenantId, docId);
+    if (x.status !== "COMPLETED") throw new CaseError(`AI extraction failed (${x.errorCategory}). Read the label manually.`);
+    return "AI transcription ready — compare it with the photo";
   });
 }
 
@@ -86,7 +135,8 @@ export async function managerUploadAction(_: ActionState, form: FormData): Promi
     const file = form.get("photo");
     if (!(file instanceof File)) throw new CaseError("Choose a photo to upload");
     await uploadLabelPhoto({ tenantId: m.tenantId, actorId: m.actorId }, str(form, "caseId"), file);
-    return "Photo uploaded; read and confirm the label below";
+    resumeAiLater(m.tenantId, str(form, "caseId"), "evidence_uploaded");
+    return "Photo uploaded; confirm the label values below";
   });
 }
 
@@ -101,6 +151,7 @@ export async function confirmReadingAction(_: ActionState, form: FormData): Prom
       lot: str(form, "lot"),
       bestBefore: str(form, "bestBefore"),
     });
+    resumeAiLater(m.tenantId, str(form, "caseId"), "evidence_confirmed");
     return `Reassessed: ${evaluation.status.replaceAll("_", " ").toLowerCase()}`;
   });
 }
@@ -127,6 +178,7 @@ export async function kitchenUploadAction(_: ActionState, form: FormData): Promi
     const file = form.get("photo");
     if (!(file instanceof File)) throw new CaseError("Choose a photo to upload");
     await uploadLabelPhoto(p, str(form, "caseId"), file);
+    resumeAiLater(p.tenantId, str(form, "caseId"), "evidence_uploaded");
     return "Photo sent to the manager. Thank you.";
   });
 }

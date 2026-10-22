@@ -1,6 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
 // Set E2E_SCREENSHOTS=1 to save full-page screenshots of each view.
+const AI = process.env.E2E_AI === "1";
 const shot = (p: Page, name: string) =>
   process.env.E2E_SCREENSHOTS ? p.screenshot({ path: `test-results/screens/${name}.png`, fullPage: true }) : null;
 
@@ -23,7 +24,7 @@ test("three kitchens: match, exclusion, missing label resolved, staff report, re
   await expect(page.getByRole("heading", { name: "Recall response overview" })).toBeVisible();
 
   await page.getByRole("button", { name: "Reset demo" }).click();
-  await expect(page.locator("form [role=status]")).toHaveText(/Demo data reset/);
+  await expect(page.locator("form [role=status]")).toHaveText(/Demo data reset/, { timeout: 30_000 });
   const row = (site: string) => page.getByRole("row").filter({ hasText: site });
   await expect(row("Les Lilas")).toContainText("Recorded match");
   await expect(row("Belleville")).toContainText("Not matching this notice");
@@ -33,7 +34,14 @@ test("three kitchens: match, exclusion, missing label resolved, staff report, re
 
   // Investigate the incomplete case: it should request the label.
   await row("Montreuil").getByRole("link").click();
-  await page.getByRole("button", { name: "Run investigation" }).click();
+  if (AI) {
+    await page.getByRole("button", { name: "Run AI investigation" }).click();
+    await expect(page.locator("form [role=status]").first()).toHaveText(/AI investigation: evidence still needed/, { timeout: 150_000 });
+    await expect(page.getByText(/AI · claude/).first()).toBeVisible();
+  } else {
+    await page.getByRole("button", { name: "Rule-based check (no AI)" }).click();
+    await expect(page.getByText("Rule-based (no AI)").first()).toBeVisible();
+  }
   await expect(page.getByText(/Open evidence request · lot, best_before/)).toBeVisible();
   await page.getByRole("button", { name: "Request kitchen stock check" }).click();
   await expect(page.getByRole("link", { name: /kitchen page/ })).toBeVisible();
@@ -58,13 +66,25 @@ test("three kitchens: match, exclusion, missing label resolved, staff report, re
   // Manager reads the label and confirms; the case is reassessed.
   await page.reload();
   await expect(page.getByAltText("Uploaded label photo")).toBeVisible();
+  if (AI) {
+    // The upload triggers an AI segment in the background, which transcribes the label.
+    // Ambiguous characters (e.g. O/0) are deliberately not pre-filled, so check the transcription panel itself.
+    await expect(async () => {
+      await page.reload();
+      await expect(page.locator("dd", { hasText: /^K100$/ })).toBeVisible({ timeout: 2_000 });
+    }).toPass({ timeout: 150_000 });
+    await expect(page.getByText("AI transcription · unconfirmed")).toBeVisible();
+    await expect(page.locator("main header")).toContainText("Needs evidence"); // unconfirmed values change nothing
+    await expect(page.getByText(/^Running/)).toHaveCount(0, { timeout: 150_000 });
+    await page.reload();
+  }
   await page.getByLabel("Lot code").fill("K100");
   await page.getByLabel("Best before (DD/MM/YYYY)").fill("10/12/2026");
-  await page.getByLabel(/I read these values/).check();
-  await page.getByRole("button", { name: "Confirm reading & reassess" }).click();
+  await page.getByLabel(/I compared these values/).check();
+  await page.getByRole("button", { name: "Confirm values & reassess" }).click();
   // The confirm form is replaced by the confirmed values, so assert persisted state.
   await expect(page.locator("main header")).toContainText("Recorded match");
-  await expect(page.getByText("Confirmed lot: K100 by demo-manager")).toBeVisible();
+  await expect(page.getByText(/Confirmed lot: K100/)).toBeVisible();
   await expect(page.getByText("Confirmed label reading").first()).toBeVisible();
 
   // Kitchen reports a typed, confirmed action.
