@@ -1,2 +1,2 @@
 // Bump when deploying so /api/health shows which code Aiven Runtime is running.
-export const RELEASE = "2026-10-22.4-redesign-eval";
+export const RELEASE = "2026-10-22.5-new-identity";

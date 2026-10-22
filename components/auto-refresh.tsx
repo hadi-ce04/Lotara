@@ -16,5 +16,5 @@ export function AutoRefresh({ intervalMs = 3000 }: { intervalMs?: number }) {
     const id = setInterval(tick, intervalMs);
     return () => clearInterval(id);
   }, [router, intervalMs]);
-  return <span className="text-xs text-slate-500">{at ? `View refreshed ${at}` : "Live view"}</span>;
+  return <span className="text-xs text-muted">{at ? `View refreshed ${at}` : "Live view"}</span>;
 }

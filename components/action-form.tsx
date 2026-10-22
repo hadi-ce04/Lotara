@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, type ReactNode } from "react";
-import { CheckCircle2, AlertTriangle, Loader2 } from "lucide-react";
+
 import type { ActionState } from "@/app/actions";
 
 type Props = {
@@ -15,9 +15,9 @@ type Props = {
 };
 
 const VARIANTS = {
-  primary: "bg-slate-900 text-white shadow-sm hover:bg-slate-700",
-  secondary: "bg-white text-slate-900 ring-1 ring-slate-300 hover:bg-slate-50",
-  danger: "bg-white text-red-700 ring-1 ring-red-300 hover:bg-red-50",
+  primary: "bg-forest text-paper hover:bg-forest-deep",
+  secondary: "bg-card text-ink border border-ink hover:bg-forest-soft",
+  danger: "bg-card text-tomato border border-tomato hover:bg-tomato-soft",
 };
 
 const SIZES = {
@@ -35,19 +35,18 @@ export function ActionForm({ action, submitLabel, pendingLabel, children, varian
         <button
           type="submit"
           disabled={pending}
-          className={`inline-flex items-center gap-2 rounded-lg font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 disabled:opacity-60 ${SIZES[size]} ${VARIANTS[variant]}`}
+          className={`inline-flex items-center gap-2 rounded-sm font-semibold transition-colors duration-100 disabled:opacity-60 ${SIZES[size]} ${VARIANTS[variant]}`}
         >
-          {pending && <Loader2 className="size-4 animate-spin" aria-hidden />}
           {pending ? (pendingLabel ?? "Working…") : submitLabel}
         </button>
         {state?.error && (
-          <p role="alert" className="inline-flex items-center gap-1 text-sm text-red-700">
-            <AlertTriangle className="size-4" aria-hidden /> {state.error}
+          <p role="alert" className="inline-flex items-center gap-1 text-sm text-tomato">
+            <span aria-hidden className="font-semibold">×</span> {state.error}
           </p>
         )}
         {state?.ok && !pending && (
-          <p role="status" className="inline-flex items-center gap-1 text-sm text-slate-700">
-            <CheckCircle2 className="size-4" aria-hidden /> {state.ok}
+          <p role="status" className="inline-flex items-center gap-1 text-sm text-ink">
+            <span aria-hidden className="font-semibold text-forest">✓</span> {state.ok}
           </p>
         )}
       </div>

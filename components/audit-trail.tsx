@@ -56,14 +56,14 @@ function describe(e: Event): string {
 const actor = (id: string) => (id.startsWith("participant:") ? "kitchen staff (signed link)" : id);
 
 export function AuditTrail({ events }: { events: Event[] }) {
-  if (events.length === 0) return <p className="text-sm text-slate-600">No events yet.</p>;
+  if (events.length === 0) return <p className="text-sm text-muted">No events yet.</p>;
   return (
     <ol className="space-y-3">
       {events.map((e) => (
-        <li key={e.id} className="relative border-l-2 border-slate-200 pl-4">
-          <span aria-hidden className="absolute -left-[5px] top-1.5 size-2 rounded-full bg-slate-400" />
-          <p className="text-sm text-slate-900">{describe(e)}</p>
-          <p className="text-xs text-slate-500">
+        <li key={e.id} className="relative border-l-2 border-rule pl-4">
+          <span aria-hidden className="absolute -left-[5px] top-1.5 size-2 rounded-sm bg-rule-strong" />
+          <p className="text-sm text-ink">{describe(e)}</p>
+          <p className="text-xs text-muted">
             {fmtDateTime(e.occurred_at)} · {actor(e.actor_id)} · <span className="font-mono">{e.event_type}</span>
           </p>
         </li>

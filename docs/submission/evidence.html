@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --paper:#f4efe4; --card:#fffcf5; --ink:#1d2a23; --muted:#5f6b63; --rule:#ddd3c1; --forest:#234e3c; --forest-soft:#dfe9e2; --tomato:#b23a1f; --stone:#5a6670; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { width:1600px; height:900px; background:var(--paper); color:var(--ink); font-family:"Public Sans",sans-serif; padding:52px 64px; }
+  h1 { font-family:"Fraunces",serif; font-size:46px; letter-spacing:-.5px; }
+  .sub { font-size:20px; color:var(--muted); margin-top:8px; }
+  .rows { margin-top:34px; display:flex; flex-direction:column; gap:30px; }
+  .metric h2 { font-size:15px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
+  .bar { display:grid; grid-template-columns:330px 1fr 110px; align-items:center; gap:16px; margin:7px 0; font-size:19px; }
+  .track { height:26px; background:var(--card); border:1px solid var(--rule); border-radius:3px; overflow:hidden; }
+  .fill { height:100%; background:var(--stone); }
+  .ours .fill { background:var(--forest); }
+  .bad .fill { background:var(--tomato); }
+  .num { font-family:"IBM Plex Mono"; font-weight:600; font-size:21px; text-align:right; font-variant-numeric:tabular-nums; }
+  .ours { font-weight:700; }
+  .foot { position:absolute; bottom:40px; left:64px; right:64px; font-size:16px; color:var(--muted); border-top:1px solid var(--rule); padding-top:12px; line-height:1.45; }
+</style>
+</head>
+<body>
+  <h1>Lotara vs. naive baselines on 28 labelled recall cases</h1>
+  <p class="sub">Real RappelConso notice 2026-04-0331 · 28 unique synthetic deliveries, 16 affected · AI arm run end to end on Aiven PostgreSQL with Claude</p>
+  <div class="rows">
+    <div class="metric"><h2>Declared matches that were correct (higher is better)</h2>
+      <div class="bar"><span>Name-only matching</span><div class="track"><div class="fill" style="width:59.3%"></div></div><span class="num">16/27</span></div>
+      <div class="bar"><span>Exact rules on records</span><div class="track"><div class="fill" style="width:100%"></div></div><span class="num">7/7</span></div>
+      <div class="bar ours"><span>Lotara: rules + AI evidence</span><div class="track"><div class="fill" style="width:100%"></div></div><span class="num">11/11</span></div>
+    </div>
+    <div class="metric"><h2>False alarms on unaffected cases (lower is better)</h2>
+      <div class="bar bad"><span>Name-only matching</span><div class="track"><div class="fill" style="width:91.7%"></div></div><span class="num">11/12</span></div>
+      <div class="bar bad"><span>Exact rules on records</span><div class="track"><div class="fill" style="width:33.3%"></div></div><span class="num">4/12</span></div>
+      <div class="bar ours"><span>Lotara: rules + AI evidence</span><div class="track"><div class="fill" style="width:8.3%"></div></div><span class="num">1/12</span></div>
+    </div>
+    <div class="metric"><h2>Affected kitchens confirmed with evidence (higher is better)</h2>
+      <div class="bar"><span>Exact rules on records</span><div class="track"><div class="fill" style="width:43.8%"></div></div><span class="num">7/16</span></div>
+      <div class="bar ours"><span>Lotara: rules + AI evidence</span><div class="track"><div class="fill" style="width:68.8%"></div></div><span class="num">11/16</span></div>
+    </div>
+  </div>
+  <p class="foot">Name-only “confirms” 16/16 only by alarming 11 of 12 unaffected cases, so it is omitted from the last chart. Lotara resolved 7 of 9 missing-evidence cases; the AI read 13/13 labels exactly and never changed a status without human confirmation. Misses: 1 case where the delivery record had the wrong lot (no arm caught it); 2 cases needing a barcode confirmation the prototype does not yet accept. About US$0.18 of model usage per investigated case. Synthetic data and simulated confirmations; no real incidents or time savings claimed.</p>
+</body>
+</html>

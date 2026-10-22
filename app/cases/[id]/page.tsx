@@ -1,10 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
-import {
-  ArrowDown, ArrowLeft, Bot, Camera, ClipboardCheck, ClipboardList, ExternalLink, Hourglass, Link2, ListChecks,
-  MessageSquareText, ScrollText, ShieldAlert, Sparkles, Upload,
-} from "lucide-react";
 import { ActionForm } from "@/components/action-form";
 import { AuditTrail } from "@/components/audit-trail";
 import { AutoRefresh } from "@/components/auto-refresh";
@@ -44,9 +40,9 @@ export default function CasePage({ params }: PageProps<"/cases/[id]">) {
 function LoadingCase() {
   return (
     <div className="mx-auto w-full max-w-6xl space-y-4 px-4 py-8" aria-busy="true">
-      <p className="text-sm text-slate-500">Loading case…</p>
-      <div className="h-56 animate-pulse rounded-xl bg-slate-200/60" />
-      <div className="h-40 animate-pulse rounded-xl bg-slate-200/60" />
+      <p className="text-sm text-muted">Loading case…</p>
+      <div className="h-56 animate-pulse rounded-sm bg-rule/60" />
+      <div className="h-40 animate-pulse rounded-sm bg-rule/60" />
     </div>
   );
 }
@@ -100,8 +96,8 @@ async function CaseWorkspace({ params }: { params: Promise<{ id: string }> }) {
   const kitchenLinkBlock = (
     <div className="space-y-2">
       <div className="flex flex-wrap items-center gap-2">
-        <Link href={kitchenLink} target="_blank" className="inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-2 text-sm font-medium text-sky-800 ring-1 ring-sky-300 hover:bg-sky-50">
-          <Link2 className="size-4" aria-hidden /> Open {c.site_name} kitchen page
+        <Link href={kitchenLink} target="_blank" className="inline-flex items-center gap-1.5 rounded-sm bg-card px-3 py-2 text-sm font-medium text-harbour ring-1 ring-harbour/40 hover:bg-harbour-soft">
+          Open {c.site_name} kitchen page
         </Link>
         <CopyLink href={kitchenLink} />
       </div>
@@ -109,28 +105,24 @@ async function CaseWorkspace({ params }: { params: Promise<{ id: string }> }) {
     </div>
   );
 
-  const nextStep: Record<NextKind, { title: string; body: ReactNode; icon: ReactNode; tone: string; action?: ReactNode }> = {
+  const nextStep: Record<NextKind, { title: string; body: ReactNode; tone: string; action?: ReactNode }> = {
     done: {
       title: "Reviewed complete",
-      icon: <ClipboardCheck className="size-5" aria-hidden />,
-      tone: "border-emerald-300 bg-emerald-50",
+      tone: "border-sage/40 bg-sage-soft",
       body: <>Nothing left to do for this kitchen. You reviewed the kitchen&apos;s report{latestReport ? ` (${STAFF_ACTION_TEXT[latestReport.reported_action].toLowerCase()})` : ""}. A staff report is not independent proof that stock was removed.</>,
     },
     confirm: {
       title: "Confirm what the label says",
-      icon: <ListChecks className="size-5" aria-hidden />,
-      tone: "border-sky-300 bg-sky-50",
+      tone: "border-harbour/40 bg-harbour-soft",
       body: <>A label photo has arrived. Compare it with the AI transcription and type the lot code and best-before date yourself. The result is recalculated from your values.</>,
       action: (
-        <a href="#evidence" className="inline-flex items-center gap-1.5 rounded-lg bg-slate-900 px-3.5 py-2 text-sm font-medium text-white shadow-sm hover:bg-slate-700">
-          Go to the label check <ArrowDown className="size-4" aria-hidden />
-        </a>
+        <a href="#evidence" className="inline-flex items-center gap-1.5 rounded-sm bg-forest px-3.5 py-2 text-sm font-medium text-paper hover:bg-forest-deep">
+          Go to the label check         </a>
       ),
     },
     investigate: {
       title: "Find out which batch was delivered",
-      icon: <Sparkles className="size-5" aria-hidden />,
-      tone: "border-amber-300 bg-amber-50",
+      tone: "border-ochre/40 bg-ochre-soft",
       body: aiAvailable
         ? <>The AI investigator re-reads the notice and the delivery record and, if information is missing, asks the kitchen for a label photo. The decision itself is made by fixed rules, not by the AI.</>
         : <>AI is not available on this server. The rule-based check does the same checks without AI and asks the kitchen for a label photo if information is missing.</>,
@@ -142,15 +134,13 @@ async function CaseWorkspace({ params }: { params: Promise<{ id: string }> }) {
     },
     await_photo: {
       title: "Waiting for the kitchen's label photo",
-      icon: <Camera className="size-5" aria-hidden />,
-      tone: "border-amber-300 bg-amber-50",
+      tone: "border-ochre/40 bg-ochre-soft",
       body: <>{c.site_name} has been asked to photograph a label showing the {(openRequest?.requested_fields ?? ["lot"]).map((f: string) => FIELD_NAME[f] ?? f).join(" and ")}. Send them their kitchen page link if they don&apos;t have it yet. This page updates by itself when the photo arrives.</>,
       action: kitchenLinkBlock,
     },
     review: {
       title: "Review the kitchen's report",
-      icon: <MessageSquareText className="size-5" aria-hidden />,
-      tone: "border-indigo-300 bg-indigo-50",
+      tone: "border-harbour/40 bg-harbour-soft",
       body: latestReport ? (
         <>Kitchen reported: <strong>{STAFF_ACTION_TEXT[latestReport.reported_action]}</strong>
           {latestReport.quantity_if_known !== null ? ` (${Number(latestReport.quantity_if_known)} ${latestReport.unit ?? ""})` : ""}. If this answers the notice, mark the case reviewed complete. A staff report is not independent verification.</>
@@ -163,8 +153,7 @@ async function CaseWorkspace({ params }: { params: Promise<{ id: string }> }) {
     },
     request_check: {
       title: "Ask the kitchen to check its stock",
-      icon: <ClipboardList className="size-5" aria-hidden />,
-      tone: "border-red-300 bg-red-50",
+      tone: "border-tomato/40 bg-tomato-soft",
       body: <>{c.site_name} received a recalled batch. Ask them to check whether any is left and set it aside as the notice says. They will get a simple page to report what they did.</>,
       action: (
         <ActionForm action={requestStaffCheckAction} submitLabel="Request kitchen stock check" pendingLabel="Requesting…" className="">{hidden()}</ActionForm>
@@ -172,21 +161,18 @@ async function CaseWorkspace({ params }: { params: Promise<{ id: string }> }) {
     },
     await_report: {
       title: "Waiting for the kitchen's stock-check report",
-      icon: <Hourglass className="size-5" aria-hidden />,
-      tone: "border-sky-300 bg-sky-50",
+      tone: "border-harbour/40 bg-harbour-soft",
       body: <>{c.site_name} has been asked to check its stock and report what it did. Send them their kitchen page link if they don&apos;t have it yet.</>,
       action: kitchenLinkBlock,
     },
     escalated: {
       title: "Escalated",
-      icon: <ShieldAlert className="size-5" aria-hidden />,
-      tone: "border-orange-300 bg-orange-50",
+      tone: "border-tomato/40 bg-tomato-soft",
       body: <>This case was escalated. Follow up with the kitchen directly.</>,
     },
     none: {
       title: "No action required by this notice",
-      icon: <ScrollText className="size-5" aria-hidden />,
-      tone: "border-slate-300 bg-slate-50",
+      tone: "border-rule-strong bg-paper",
       body: <>This delivery does not meet the batch criteria of this notice. That is not a safety statement: other notices are checked separately.</>,
     },
   };
@@ -199,54 +185,54 @@ async function CaseWorkspace({ params }: { params: Promise<{ id: string }> }) {
 
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 space-y-6 px-4 py-6">
-      <Link href="/" className="inline-flex items-center gap-1 text-sm text-slate-600 hover:text-slate-900 hover:underline">
-        <ArrowLeft className="size-4" aria-hidden /> All kitchens (overview)
+      <Link href="/" className="inline-flex items-center gap-1 text-sm text-muted hover:text-ink hover:underline">
+        All kitchens (overview)
       </Link>
 
       <header className="space-y-2">
         <Eyebrow>Case · {capitalize(c.title)} · RappelConso {c.source_id}</Eyebrow>
         <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-          <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{c.site_name}</h1>
+          <h1 className="font-display text-4xl font-semibold leading-[1.05] tracking-tight [font-variation-settings:'opsz'_144] sm:text-5xl">{c.site_name}</h1>
           <MatchBadge status={m} size="md" />
           <ResponseBadge status={r} size="md" />
         </div>
-        <p className="text-xs text-slate-500">{c.city} · case version {c.version}</p>
+        <p className="text-xs text-muted">{c.city} · case version {c.version}</p>
       </header>
 
       {/* Situation + next step */}
-      <section aria-labelledby="situation" className="rounded-xl border border-slate-200 bg-white shadow-sm">
+      <section aria-labelledby="situation" className="rounded-sm border border-rule bg-card">
         <div className="grid gap-6 p-5 sm:p-6 lg:grid-cols-5">
           <div className="space-y-4 lg:col-span-3">
             <div>
-              <h2 id="situation" className="text-xs font-semibold uppercase tracking-wide text-slate-500">Situation</h2>
-              <p className="mt-1 text-lg font-semibold leading-snug text-slate-900 sm:text-xl">{verdict(m, reasons, { viaLabel })}</p>
-              <p className="mt-1 text-sm text-slate-600">{caveat}</p>
+              <h2 id="situation" className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted">Situation</h2>
+              <p className="mt-1 font-display text-2xl font-medium leading-snug text-ink">{verdict(m, reasons, { viaLabel })}</p>
+              <p className="mt-1 text-sm text-muted">{caveat}</p>
             </div>
             <div>
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">Why</h3>
-              <ul className="mt-1 space-y-1 text-sm text-slate-800">
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-muted">Why</h3>
+              <ul className="mt-1 space-y-1 text-sm text-ink">
                 {(whyLines(reasons).length ? whyLines(reasons) : ["The barcode is listed in this notice."]).map((w) => (
-                  <li key={w} className="flex gap-2"><span aria-hidden className="mt-2 size-1.5 shrink-0 rounded-full bg-slate-400" />{w}</li>
+                  <li key={w} className="flex gap-2"><span aria-hidden className="mt-2 size-1.5 shrink-0 rounded-sm bg-rule-strong" />{w}</li>
                 ))}
               </ul>
-              <p className="mt-2 text-xs text-slate-500">
+              <p className="mt-2 text-xs text-muted">
                 Decided by fixed matching rules from {viaLabel ? "the confirmed label reading and the delivery record" : "the delivery record (synthetic)"}.
                 {latestRun && (
-                  <> Last check: <MethodChip run={latestRun} /> at {fmtTime(latestRun.started_at)}{latestRun.status === "RUNNING" && <span className="ml-1 font-medium text-violet-800">Running…</span>}</>
+                  <> Last check: <MethodChip run={latestRun} /> at {fmtTime(latestRun.started_at)}{latestRun.status === "RUNNING" && <span className="ml-1 font-medium text-forest">Running…</span>}</>
                 )}
               </p>
             </div>
           </div>
 
-          <div className={`rounded-xl border-2 p-4 lg:col-span-2 ${step.tone}`}>
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">Next step</p>
-            <p className="mt-1 flex items-center gap-2 text-lg font-semibold text-slate-900">{step.icon}{step.title}</p>
-            <p className="mt-2 text-sm leading-relaxed text-slate-700">{step.body}</p>
+          <div className={`rounded-sm border-2 p-4 lg:col-span-2 ${step.tone}`}>
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted">Next step</p>
+            <p className="mt-1 flex items-center gap-2 text-lg font-semibold text-ink">{step.title}</p>
+            <p className="mt-2 text-sm leading-relaxed text-ink">{step.body}</p>
             {step.action && <div className="mt-4">{step.action}</div>}
           </div>
         </div>
 
-        <div className="border-t border-slate-100 px-5 py-5 sm:px-6">
+        <div className="border-t border-rule px-5 py-5 sm:px-6">
           <CaseProgress
             match={m}
             response={r}
@@ -254,21 +240,21 @@ async function CaseWorkspace({ params }: { params: Promise<{ id: string }> }) {
           />
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 rounded-b-xl border-t border-slate-100 bg-slate-50 px-5 py-3 sm:px-6">
-          <span className="mr-1 text-xs text-slate-500">Re-check this case:</span>
+        <div className="flex flex-wrap items-center gap-2 rounded-b-xl border-t border-rule bg-paper px-5 py-3 sm:px-6">
+          <span className="mr-1 text-xs text-muted">Re-check this case:</span>
           {aiAvailable && next !== "investigate" && (
             <ActionForm action={aiInvestigateAction} submitLabel="Run AI investigation" pendingLabel="AI investigating…" variant="secondary" size="sm" className="">{hidden()}</ActionForm>
           )}
           {!(next === "investigate" && !aiAvailable) && (
             <ActionForm action={investigateAction} submitLabel="Rule-based check (no AI)" pendingLabel="Checking…" variant="secondary" size="sm" className="">{hidden()}</ActionForm>
           )}
-          {!aiAvailable && <span className="text-xs text-slate-500">AI investigation is unavailable on this server (no API key configured).</span>}
+          {!aiAvailable && <span className="text-xs text-muted">AI investigation is unavailable on this server (no API key configured).</span>}
         </div>
       </section>
 
       {/* Comparison */}
-      <Card title="Recall vs. this delivery" icon={<ListChecks className="size-5 text-slate-500" aria-hidden />}>
-        <p className="mb-3 text-sm text-slate-600">
+      <Card title="Recall vs. this delivery">
+        <p className="mb-3 text-sm text-muted">
           Delivery record {c.source_ref} (synthetic): {c.product_name_raw} from {c.supplier}, received {fmtDay(c.received_at)}, {Number(c.quantity)} {c.unit}.
         </p>
         <Comparison
@@ -286,60 +272,60 @@ async function CaseWorkspace({ params }: { params: Promise<{ id: string }> }) {
       </Card>
 
       {/* Evidence */}
-      <Card id="evidence" title="Label evidence" icon={<Camera className="size-5 text-slate-500" aria-hidden />}>
+      <Card id="evidence" title="Label evidence">
         <div className="space-y-5">
           {openRequest && (
-            <div className="rounded-lg bg-amber-50 p-4 text-sm text-amber-950 ring-1 ring-amber-200">
+            <div className="rounded-sm bg-ochre-soft p-4 text-sm text-ochre ring-1 ring-ochre/40">
               <p className="font-semibold">Photo requested from the kitchen · {openRequest.requested_fields.map((f: string) => FIELD_NAME[f] ?? f).join(", ")}</p>
               <p className="mt-1 leading-relaxed">“{openRequest.request_text}”</p>
             </div>
           )}
           {documents.length === 0 && !openRequest && (
-            <p className="text-sm text-slate-600">
+            <p className="text-sm text-muted">
               {m === "NEEDS_EVIDENCE" ? "No label photo yet. Run the investigation to ask the kitchen for one." : "No label photo was needed: the delivery record was enough to decide."}
             </p>
           )}
-          {documents.length === 0 && openRequest && <p className="text-sm text-slate-600">No photo received yet.</p>}
+          {documents.length === 0 && openRequest && <p className="text-sm text-muted">No photo received yet.</p>}
           {documents.map((d) => (
             <LabelEvidence key={d.id} doc={d} caseId={c.id} version={c.version} aiAvailable={aiAvailable}
               items={evidence.filter((e) => e.document_id === d.id)} />
           ))}
           <details className="text-sm">
-            <summary className="inline-flex cursor-pointer items-center gap-1.5 text-slate-600 hover:text-slate-900">
-              <Upload className="size-4" aria-hidden /> Upload a label photo yourself
+            <summary className="inline-flex cursor-pointer items-center gap-1.5 text-muted hover:text-ink">
+              Upload a label photo yourself
             </summary>
             <ActionForm action={managerUploadAction} submitLabel="Upload photo" pendingLabel="Uploading…" variant="secondary" className="mt-3 space-y-2">
               {hidden()}
-              <input type="file" name="photo" accept="image/jpeg,image/png" required className="block text-sm file:mr-3 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:text-sm file:font-medium" />
+              <input type="file" name="photo" accept="image/jpeg,image/png" required className="block text-sm file:mr-3 file:rounded-md file:border-0 file:bg-paper file:px-3 file:py-2 file:text-sm file:font-medium" />
             </ActionForm>
           </details>
         </div>
       </Card>
 
       {/* Kitchen response */}
-      <Card title="Kitchen response" icon={<ClipboardList className="size-5 text-slate-500" aria-hidden />}>
+      <Card title="Kitchen response">
         <div className="space-y-4">
-          {m === "NOT_MATCHING_THIS_NOTICE" && <p className="text-sm text-slate-600">No stock check is needed for this notice.</p>}
+          {m === "NOT_MATCHING_THIS_NOTICE" && <p className="text-sm text-muted">No stock check is needed for this notice.</p>}
           {canRequestCheck && next !== "request_check" && (
             <div className="flex flex-wrap items-center gap-3">
               <ActionForm action={requestStaffCheckAction} submitLabel="Request kitchen stock check" pendingLabel="Requesting…" variant="secondary" className="">{hidden()}</ActionForm>
-              <span className="text-xs text-slate-500">Optional now: ask the kitchen to check and set aside the stock while the batch is being confirmed.</span>
+              <span className="text-xs text-muted">Optional now: ask the kitchen to check and set aside the stock while the batch is being confirmed.</span>
             </div>
           )}
           {showKitchenLink && !linkInNext && kitchenLinkBlock}
           {reports.length === 0 ? (
-            m !== "NOT_MATCHING_THIS_NOTICE" && <p className="text-sm text-slate-600">No report from the kitchen yet.</p>
+            m !== "NOT_MATCHING_THIS_NOTICE" && <p className="text-sm text-muted">No report from the kitchen yet.</p>
           ) : (
             <ul className="space-y-2 text-sm">
               {reports.map((rep) => (
-                <li key={rep.id} className="rounded-lg bg-indigo-50 p-4 ring-1 ring-indigo-100">
+                <li key={rep.id} className="rounded-sm bg-harbour-soft p-4 ring-1 ring-harbour-soft">
                   <p className="font-medium">Participant reported: {STAFF_ACTION_TEXT[rep.reported_action]}</p>
-                  <p className="mt-0.5 text-xs text-slate-600">
+                  <p className="mt-0.5 text-xs text-muted">
                     {rep.quantity_if_known !== null ? `${Number(rep.quantity_if_known)} ${rep.unit ?? ""} · ` : "Quantity not stated · "}
                     {fmtDateTime(rep.reported_at)} · {rep.confirmation_method.replaceAll("_", " ")}
                   </p>
                   {rep.note && <p className="mt-1 text-sm">“{rep.note}”</p>}
-                  <p className="mt-1 text-xs text-slate-500">A staff report, not independent verification.</p>
+                  <p className="mt-1 text-xs text-muted">A staff report, not independent verification.</p>
                 </li>
               ))}
             </ul>
@@ -354,18 +340,17 @@ async function CaseWorkspace({ params }: { params: Promise<{ id: string }> }) {
         <Disclosure title="Full notice scope" meta={`${scope.entries.length} recalled batches · RappelConso ${c.source_id} v${c.source_version}`}>
           <div className="space-y-4 text-sm">
             <p>
-              <a href={c.source_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-medium text-sky-800 underline">
-                Official notice RappelConso {c.source_id} v{c.source_version} <ExternalLink className="size-3.5" aria-hidden />
-              </a>
-              <span className="text-slate-600"> · published {fmtDateTime(c.published_at)} · saved copy retrieved {fmtDateTime(c.retrieved_at)}{c.replay ? " · historical replay" : ""}</span>
+              <a href={c.source_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-medium text-harbour underline">
+                Official notice RappelConso {c.source_id} v{c.source_version}               </a>
+              <span className="text-muted"> · published {fmtDateTime(c.published_at)} · saved copy retrieved {fmtDateTime(c.retrieved_at)}{c.replay ? " · historical replay" : ""}</span>
             </p>
             <RecalledBatches entries={scope.entries} highlightGtin14={caseGtin.ok ? caseGtin.gtin14 : null} />
             <dl className="grid gap-x-4 gap-y-1 sm:grid-cols-[auto_1fr]">
-              <dt className="text-slate-500">Reason (official, French)</dt><dd>{c.reason}</dd>
-              <dt className="text-slate-500">Instructions (official, French)</dt><dd>{c.instructions?.split("|").join(" · ")}</dd>
-              <dt className="text-slate-500">Delivery record</dt>
+              <dt className="text-muted">Reason (official, French)</dt><dd>{c.reason}</dd>
+              <dt className="text-muted">Instructions (official, French)</dt><dd>{c.instructions?.split("|").join(" · ")}</dd>
+              <dt className="text-muted">Delivery record</dt>
               <dd>
-                {c.source_ref} · {c.supplier} · {c.product_name_raw} · barcode <span className="font-mono">{c.gtin_raw ?? "—"}</span> · lot{" "}
+                {c.source_ref} · {c.supplier} · {c.product_name_raw} · barcode <span className="font-mono">{c.gtin_raw ?? "·"}</span> · lot{" "}
                 {c.lot_raw ? <span className="font-mono">{c.lot_raw}</span> : <NotRecorded />} · best before{" "}
                 {c.best_before_raw ? <span className="font-mono">{c.best_before_raw}</span> : <NotRecorded />} · received {fmtDateTime(c.received_at)}
               </dd>
@@ -389,8 +374,8 @@ function InvestigationDisclosure({ runs, aiAvailable }: { runs: Run[]; aiAvailab
     ? "not run yet"
     : `${runs.length} run${runs.length === 1 ? "" : "s"} · ${t.steps} steps${t.tokens ? ` · ${t.tokens.toLocaleString("en")} tokens` : ""}${t.cost ? ` · ≈$${t.cost.toFixed(3)} est.` : ""}`;
   return (
-    <Disclosure title={<span className="inline-flex items-center gap-2"><Bot className="size-4 text-violet-700" aria-hidden />{title}</span>} meta={meta}>
-      <p className="mb-4 text-xs leading-relaxed text-slate-600">
+    <Disclosure title={<span className="inline-flex items-center gap-2"> {title}</span>} meta={meta}>
+      <p className="mb-4 text-xs leading-relaxed text-muted">
         {aiAvailable
           ? `The AI investigator (${AI_MODEL}) may only use a fixed list of tools, at most 8 per run and within 120 s. The match status is always decided by the fixed matching rules; label values read by the AI need a person's confirmation. It resumes by itself after a photo upload or a confirmation.`
           : "AI investigation is unavailable on this server (no API key configured). The rule-based check runs the same steps without AI and is labelled as such."}

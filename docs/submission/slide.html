@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=IBM+Plex+Mono:wght@400;500;600&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper:#f4efe4; --card:#fffcf5; --ink:#1d2a23; --muted:#5f6b63; --rule:#ddd3c1; --rule2:#c4b8a2;
+    --forest:#234e3c; --forest-soft:#dfe9e2; --tomato:#b23a1f; --tomato-soft:#f7dfd5;
+    --ochre:#9a6200; --ochre-soft:#f5e6c4; --stone:#5a6670; --stone-soft:#e5e6e2; --sage:#2c7a4b; --sage-soft:#d8eedf;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { width:1920px; height:1080px; background:var(--paper); color:var(--ink); font-family:"Public Sans",sans-serif; }
+  .slide { width:1920px; height:1080px; padding:44px 64px 30px; display:grid; grid-template-rows:auto auto minmax(0,1fr) auto; gap:20px; }
+  .mono { font-family:"IBM Plex Mono",monospace; }
+  header { display:flex; justify-content:space-between; align-items:flex-end; border-bottom:2px solid var(--ink); padding-bottom:18px; }
+  .brand { font-family:"Fraunces",serif; font-weight:700; font-size:66px; letter-spacing:-1.5px; line-height:1; }
+  .brand small { font-family:"Public Sans"; font-weight:600; font-size:18px; letter-spacing:3px; text-transform:uppercase; color:var(--muted); margin-left:18px; vertical-align:middle; }
+  .tagline { font-family:"Fraunces",serif; font-style:italic; font-weight:500; font-size:30px; max-width:900px; text-align:right; line-height:1.2; }
+  .pitch { font-size:24px; line-height:1.4; max-width:1700px; }
+  .pitch b { color:var(--forest); }
+  .grid { display:grid; grid-template-columns: 1fr 1.15fr 1fr; gap:28px; min-height:0; }
+  .col { background:var(--card); border:1px solid var(--rule); border-radius:6px; padding:22px 26px; display:flex; flex-direction:column; gap:14px; overflow:hidden; }
+  h2 { font-family:"Fraunces",serif; font-weight:600; font-size:26px; border-bottom:1px solid var(--rule); padding-bottom:10px; display:flex; gap:12px; align-items:baseline; }
+  h2 .n { font-family:"IBM Plex Mono"; font-size:18px; color:var(--muted); font-weight:500; }
+  h3 { font-size:15px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); font-weight:700; margin-bottom:6px; }
+  p, li { font-size:18px; line-height:1.4; }
+  ul { list-style:none; display:flex; flex-direction:column; gap:7px; }
+  li { padding-left:20px; position:relative; }
+  li::before { content:""; position:absolute; left:2px; top:12px; width:8px; height:2px; background:var(--forest); }
+  .flow { display:flex; flex-direction:column; gap:0; }
+  .step { display:grid; grid-template-columns:34px 1fr; gap:12px; padding:7px 0; border-bottom:1px dashed var(--rule); align-items:start; }
+  .step:last-child { border-bottom:0; }
+  .step .k { font-family:"IBM Plex Mono"; font-weight:600; font-size:17px; color:var(--card); background:var(--forest); border-radius:3px; text-align:center; line-height:28px; height:28px; }
+  .step p { font-size:17.5px; }
+  .tag { display:inline-block; font-family:"IBM Plex Mono"; font-size:14px; font-weight:600; padding:1px 7px; border-radius:3px; letter-spacing:.5px; }
+  .t-match { background:var(--tomato-soft); color:var(--tomato); }
+  .t-need { background:var(--ochre-soft); color:var(--ochre); }
+  .t-not { background:var(--stone-soft); color:var(--stone); }
+  .t-ok { background:var(--sage-soft); color:var(--sage); }
+  table { width:100%; border-collapse:collapse; font-size:19px; }
+  th { text-align:left; font-size:14px; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); font-weight:700; padding:8px 6px; border-bottom:1.5px solid var(--ink); }
+  th.num, td.num { text-align:right; }
+  td { padding:8px 6px; border-bottom:1px solid var(--rule); }
+  td.num { font-family:"IBM Plex Mono"; font-weight:500; font-size:21px; font-variant-numeric:tabular-nums; }
+  td.best { color:var(--forest); font-weight:600; }
+  tr.ours td { background:var(--forest-soft); }
+  .note { font-size:14.5px; color:var(--muted); line-height:1.4; }
+  .data { display:grid; grid-template-columns:1fr 1fr; gap:10px 18px; }
+  .data div { font-size:17px; line-height:1.35; }
+  .data b { display:block; font-size:13px; letter-spacing:1.6px; text-transform:uppercase; color:var(--muted); margin-bottom:2px; }
+  footer { display:flex; flex-direction:column; gap:4px; border-top:1px solid var(--rule2); padding-top:14px; font-size:16px; color:var(--muted); }
+  footer .mono { color:var(--ink); font-size:16.5px; }
+</style>
+</head>
+<body>
+<div class="slide">
+  <header>
+    <div class="brand">Lotara<small>Recall response for nursery kitchens</small></div>
+    <div class="tagline">“A food product has been recalled. Which of our kitchens received the affected batch, and has someone acted?”</div>
+  </header>
+
+  <p class="pitch">Lotara turns an official recall notice into a targeted, evidence-backed response: it matches each kitchen’s deliveries against the exact <b>barcode + lot</b> criteria, sends an <b>AI investigator</b> to collect the label evidence that is missing, and tracks a <b>confirmed staff report</b> until a manager closes the case.</p>
+
+  <div class="grid">
+    <section class="col">
+      <h2><span class="n">01</span>Who, problem, why now</h2>
+      <div><h3>For</h3><p>The operations or food-safety lead at a caterer serving several nursery kitchens (crèches).</p></div>
+      <div><h3>Problem</h3>
+        <ul>
+          <li>Recalls name batches, not brands. Name-only alerts flag every kitchen with the product.</li>
+          <li>Lot codes are often not recorded at delivery, so the answer stays “unknown”.</li>
+          <li>Follow-up across sites is phone calls and memory, with no evidence trail.</li>
+        </ul></div>
+      <div><h3>Why now</h3>
+        <ul>
+          <li>French recalls are open, machine-readable data (RappelConso).</li>
+          <li>Models can now read packaging labels and use tools, if exact rules stay in charge.</li>
+        </ul></div>
+    </section>
+
+    <section class="col">
+      <h2><span class="n">02</span>How it works and where the data lives</h2>
+      <div class="flow">
+        <div class="step"><span class="k">1</span><p>Real RappelConso notice <span class="mono">2026-04-0331</span> saved with publication and retrieval times; deliveries per kitchen in <b>Aiven PostgreSQL</b>.</p></div>
+        <div class="step"><span class="k">2</span><p>Exact rules sort every delivery: <span class="tag t-match">RECORDED MATCH</span> <span class="tag t-not">NOT MATCHING</span> <span class="tag t-need">NEEDS EVIDENCE</span></p></div>
+        <div class="step"><span class="k">3</span><p>AI investigator (Claude, 7 allowlisted case-scoped tools, max 8 calls) finds the missing lot and asks that kitchen for a label photo.</p></div>
+        <div class="step"><span class="k">4</span><p>AI reads the photo as <b>unconfirmed</b> and flags look-alikes (O vs 0). A person confirms; the rules re-check.</p></div>
+        <div class="step"><span class="k">5</span><p>Kitchen sends a typed stock-check report; only the manager can mark <span class="tag t-ok">REVIEWED COMPLETE</span>.</p></div>
+      </div>
+      <div class="data">
+        <div><b>Stored in Aiven</b>notices, deliveries, cases, label photos, AI runs and tool steps, staff reports, event log</div>
+        <div><b>Guardrails</b>rules decide status; AI cannot override, cite unknown evidence or call food “safe”</div>
+      </div>
+    </section>
+
+    <section class="col">
+      <h2><span class="n">03</span>Evidence it works</h2>
+      <table>
+        <thead><tr><th>28 test cases, 16 affected</th><th class="num">Correct matches</th><th class="num">False alarms</th><th class="num">Affected confirmed</th></tr></thead>
+        <tbody>
+          <tr><td>Name-only matching</td><td class="num">16/27</td><td class="num">11/12</td><td class="num">16/16*</td></tr>
+          <tr><td>Exact rules on records</td><td class="num">7/7</td><td class="num">4/12</td><td class="num">7/16</td></tr>
+          <tr class="ours"><td><b>Lotara: rules + AI evidence</b></td><td class="num best">11/11</td><td class="num best">1/12</td><td class="num best">11/16</td></tr>
+        </tbody>
+      </table>
+      <p class="note">*Name-only flags everything, so it “finds” every affected kitchen by alarming 11 of 12 unaffected ones. Lotara resolved 7/9 missing-evidence cases; AI read 13/13 labels exactly; about US$0.18 per investigated case. Synthetic cases, one real notice, simulated confirmations.</p>
+      <div><h3>Route to first users</h3>
+        <ul>
+          <li>Supervised recall drill on historical deliveries with one multi-site nursery caterer.</li>
+          <li>Measure missed sites, false alerts and time to staff acknowledgment.</li>
+          <li>Expand through caterers’ food-safety leads to crèche networks.</li>
+        </ul></div>
+    </section>
+  </div>
+
+  <footer>
+    <span>Live demo <span class="mono">01a16320-7504-70fc-b08b-06bc2a4c1c84-8080.eur-1.aiven.app/welcome</span> · Code <span class="mono">github.com/hadi-ce04/Lotara</span></span>
+    <span>Hosted on Aiven Runtime + Aiven PostgreSQL · real notice replayed, synthetic kitchens · not a food-safety certification</span>
+  </footer>
+</div>
+</body>
+</html>

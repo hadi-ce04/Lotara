@@ -1,16 +1,43 @@
 @import "tailwindcss";
 
-@theme inline {
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/*
+  Lotara design tokens. Inspired by printed recall notices and food labels:
+  warm paper, ink, ruled lines. Status colours carry meaning and always
+  appear with text.
+*/
+@theme {
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-display), ui-serif, Georgia, serif;
+  --font-mono: var(--font-code), ui-monospace, monospace;
+
+  --color-paper: #f4efe4;     /* page */
+  --color-card: #fffcf5;      /* surfaces */
+  --color-ink: #1d2a23;       /* text */
+  --color-muted: #5f6b63;     /* secondary text */
+  --color-rule: #ddd3c1;      /* hairlines */
+  --color-rule-strong: #c4b8a2;
+
+  --color-forest: #234e3c;    /* brand, primary actions */
+  --color-forest-deep: #183829;
+  --color-forest-soft: #dfe9e2;
+
+  --color-tomato: #b23a1f;    /* Recorded match */
+  --color-tomato-soft: #f7dfd5;
+  --color-ochre: #9a6200;     /* Needs evidence */
+  --color-ochre-soft: #f5e6c4;
+  --color-stone: #5a6670;     /* Not matching this notice */
+  --color-stone-soft: #e5e6e2;
+  --color-sage: #2c7a4b;      /* Reviewed complete (only success state) */
+  --color-sage-soft: #d8eedf;
+  --color-harbour: #2b5d86;   /* staff check / informational */
+  --color-harbour-soft: #dce8f2;
 }
 
 body {
-  background: #f6f7f9;
-  color: #0f172a;
+  font-feature-settings: "kern", "liga";
 }
 
 :where(a, button, input, textarea, select, summary):focus-visible {
-  outline: 2px solid #0284c7;
+  outline: 2px solid var(--color-forest);
   outline-offset: 2px;
 }

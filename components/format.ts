@@ -15,6 +15,6 @@ export const fmtIsoDay = (s: string | null | undefined) => {
   return m ? `${m[3]}/${m[2]}/${m[1]}` : s;
 };
 
-export const capitalize = (s: string) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
+export const capitalize = (s: string) => (s ? (s.charAt(0).toUpperCase() + s.slice(1)).replace(/\s*\u2014\s*/g, ": ") : s);
 
 export const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;

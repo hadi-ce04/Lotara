@@ -1,4 +1,4 @@
-import { Check, Minus } from "lucide-react";
+
 import type { MatchStatus, ResponseStatus } from "@/lib/cases";
 
 type StepState = "done" | "current" | "todo" | "skipped";
@@ -47,10 +47,10 @@ export function caseSteps({ match, response, evidence }: ProgressInput): Step[] 
 }
 
 const DOT: Record<StepState, string> = {
-  done: "bg-slate-800 text-white ring-1 ring-slate-800",
-  current: "bg-white text-sky-800 ring-2 ring-sky-600",
-  todo: "bg-white text-slate-400 ring-1 ring-slate-300",
-  skipped: "border border-dashed border-slate-300 bg-white text-slate-400",
+  done: "bg-forest text-paper ring-1 ring-rule-strong",
+  current: "bg-card text-harbour ring-2 ring-harbour",
+  todo: "bg-card text-muted ring-1 ring-rule-strong",
+  skipped: "border border-dashed border-rule-strong bg-card text-muted",
 };
 const STATE_TEXT: Record<StepState, string> = { done: "done", current: "in progress", todo: "not started", skipped: "not needed" };
 
@@ -67,18 +67,18 @@ export function CaseProgress({ compact = false, ...input }: ProgressInput & { co
             {i > 0 && (
               <span
                 aria-hidden
-                className={`absolute right-1/2 ${compact ? "top-3" : "top-4"} h-0.5 w-full ${steps[i - 1].state === "done" && s.state !== "todo" ? "bg-slate-700" : "bg-slate-200"}`}
+                className={`absolute right-1/2 ${compact ? "top-3" : "top-4"} h-0.5 w-full ${steps[i - 1].state === "done" && s.state !== "todo" ? "bg-forest" : "bg-rule"}`}
               />
             )}
             <span
-              className={`relative z-10 flex items-center justify-center rounded-full ${compact ? "size-6 text-xs" : "size-8 text-sm"} font-semibold ${finalDone ? "bg-emerald-600 text-white ring-1 ring-emerald-600" : DOT[s.state]}`}
+              className={`relative z-10 flex items-center justify-center rounded-full ${compact ? "size-6 text-xs" : "size-8 text-sm"} font-mono font-semibold ${finalDone ? "bg-sage text-paper ring-1 ring-sage" : DOT[s.state]}`}
             >
-              {s.state === "done" ? <Check className={compact ? "size-3.5" : "size-4"} aria-hidden /> : s.state === "skipped" ? <Minus className="size-3.5" aria-hidden /> : i + 1}
+              {s.state === "done" ? "✓" : s.state === "skipped" ? "–" : i + 1}
             </span>
-            <span className={`mt-1.5 font-medium leading-tight ${compact ? "text-[11px]" : "text-sm"} ${s.state === "skipped" || s.state === "todo" ? "text-slate-500" : "text-slate-900"}`}>
+            <span className={`mt-1.5 font-medium leading-tight ${compact ? "text-[11px]" : "text-sm"} ${s.state === "skipped" || s.state === "todo" ? "text-muted" : "text-ink"}`}>
               {s.label}
             </span>
-            <span className={`leading-tight ${compact ? "text-[11px]" : "text-xs"} ${s.state === "current" ? "font-medium text-sky-800" : "text-slate-500"}`}>
+            <span className={`leading-tight ${compact ? "text-[11px]" : "text-xs"} ${s.state === "current" ? "font-medium text-harbour" : "text-muted"}`}>
               {(!compact || s.state === "current") && s.note}
               <span className="sr-only"> ({STATE_TEXT[s.state]})</span>
             </span>

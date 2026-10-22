@@ -117,7 +117,7 @@ export async function extractLabelAction(_: ActionState, form: FormData): Promis
     await getPool().query(`DELETE FROM label_extractions WHERE tenant_id = $1 AND document_id = $2 AND status = 'FAILED'`, [m.tenantId, docId]);
     const x = await extractLabel(m.tenantId, docId);
     if (x.status !== "COMPLETED") throw new CaseError(`AI extraction failed (${x.errorCategory}). Read the label manually.`);
-    return "AI transcription ready — compare it with the photo";
+    return "AI transcription ready. Compare it with the photo";
   });
 }
 
@@ -204,6 +204,6 @@ export async function staffReportAction(_: ActionState, form: FormData): Promise
       note: str(form, "note").trim().slice(0, 500) || null,
       idempotencyKey,
     });
-    return result.duplicate ? "Already received — your report was recorded once." : "Report recorded. The manager will review it.";
+    return result.duplicate ? "Already received. Your report was recorded once." : "Report recorded. The manager will review it.";
   });
 }
