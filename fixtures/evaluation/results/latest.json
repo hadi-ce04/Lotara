@@ -1,0 +1,3107 @@
+{
+  "generatedAt": "2026-10-22T11:31:16.974Z",
+  "notice": {
+    "sourceId": "2026-04-0331",
+    "sourceVersion": 1,
+    "retrievedAt": "2026-10-22T09:44:22Z",
+    "entries": [
+      "GTIN 4056489470458 lot k100 (2026-12-10)",
+      "GTIN 4056489470458 lot k101 (2026-12-11)",
+      "GTIN 4056489470441 lot k099 (2026-12-09)",
+      "GTIN 4056489470441 lot k100 (2026-12-10)"
+    ]
+  },
+  "model": {
+    "id": "claude-opus-5-5",
+    "effort": "medium",
+    "promptVersion": "investigator-v1"
+  },
+  "fixture": {
+    "total": 30,
+    "dev": 12,
+    "holdout": 18,
+    "uniqueCases": 28,
+    "devUnique": 11,
+    "holdoutUnique": 17,
+    "duplicateCopies": 2
+  },
+  "dbSeedConsistency": {
+    "checked": 30,
+    "mismatches": []
+  },
+  "arms": {
+    "nameBaseline": {
+      "metrics": {
+        "dev": {
+          "uniqueCases": 11,
+          "affected": 7,
+          "declaredRecordedMatch": 10,
+          "needsEvidence": 0,
+          "recordedMatchPrecision": {
+            "n": 7,
+            "d": 10,
+            "pct": 70
+          },
+          "triageRecall": {
+            "n": 7,
+            "d": 7,
+            "pct": 100
+          },
+          "confirmedMatchRecall": {
+            "n": 7,
+            "d": 7,
+            "pct": 100
+          },
+          "incorrectExclusionRate": {
+            "n": 0,
+            "d": 7,
+            "pct": 0
+          },
+          "falseAlertRate": {
+            "n": 3,
+            "d": 4,
+            "pct": 75
+          },
+          "agreementWithExpected": {
+            "n": 5,
+            "d": 11,
+            "pct": 45.5
+          }
+        },
+        "holdout": {
+          "uniqueCases": 17,
+          "affected": 9,
+          "declaredRecordedMatch": 17,
+          "needsEvidence": 0,
+          "recordedMatchPrecision": {
+            "n": 9,
+            "d": 17,
+            "pct": 52.9
+          },
+          "triageRecall": {
+            "n": 9,
+            "d": 9,
+            "pct": 100
+          },
+          "confirmedMatchRecall": {
+            "n": 9,
+            "d": 9,
+            "pct": 100
+          },
+          "incorrectExclusionRate": {
+            "n": 0,
+            "d": 9,
+            "pct": 0
+          },
+          "falseAlertRate": {
+            "n": 8,
+            "d": 8,
+            "pct": 100
+          },
+          "agreementWithExpected": {
+            "n": 3,
+            "d": 17,
+            "pct": 17.6
+          }
+        },
+        "overall": {
+          "uniqueCases": 28,
+          "affected": 16,
+          "declaredRecordedMatch": 27,
+          "needsEvidence": 0,
+          "recordedMatchPrecision": {
+            "n": 16,
+            "d": 27,
+            "pct": 59.3
+          },
+          "triageRecall": {
+            "n": 16,
+            "d": 16,
+            "pct": 100
+          },
+          "confirmedMatchRecall": {
+            "n": 16,
+            "d": 16,
+            "pct": 100
+          },
+          "incorrectExclusionRate": {
+            "n": 0,
+            "d": 16,
+            "pct": 0
+          },
+          "falseAlertRate": {
+            "n": 11,
+            "d": 12,
+            "pct": 91.7
+          },
+          "agreementWithExpected": {
+            "n": 8,
+            "d": 28,
+            "pct": 28.6
+          }
+        }
+      },
+      "duplicates": {
+        "copies": 2,
+        "sameStatusAsOriginal": {
+          "n": 2,
+          "d": 2,
+          "pct": 100
+        },
+        "detectedAsDuplicate": {
+          "n": 0,
+          "d": 2,
+          "pct": 0
+        },
+        "details": [
+          {
+            "id": "D12",
+            "duplicateOf": "D01",
+            "status": "RECORDED_MATCH",
+            "originalStatus": "RECORDED_MATCH"
+          },
+          {
+            "id": "H18",
+            "duplicateOf": "H11",
+            "status": "RECORDED_MATCH",
+            "originalStatus": "RECORDED_MATCH"
+          }
+        ]
+      },
+      "failures": [
+        {
+          "id": "D05",
+          "split": "dev",
+          "stage": "before",
+          "got": "RECORDED_MATCH",
+          "expected": "NOT_MATCHING_THIS_NOTICE",
+          "affected": false,
+          "category": "lot_not_listed",
+          "rationale": "GTIN ...458 is listed but lot K102 is not."
+        },
+        {
+          "id": "D06",
+          "split": "dev",
+          "stage": "before",
+          "got": "RECORDED_MATCH",
+          "expected": "NOT_MATCHING_THIS_NOTICE",
+          "affected": false,
+          "category": "lot_under_other_gtin",
+          "rationale": "K101 is listed only under GTIN ...458, not ...441."
+        },
+        {
+          "id": "D09",
+          "split": "dev",
+          "stage": "before",
+          "got": "RECORDED_MATCH",
+          "expected": "NEEDS_EVIDENCE",
+          "affected": false,
+          "category": "missing_lot",
+          "rationale": "Lot missing; label shows K102, not listed for ...458."
+        },
+        {
+          "id": "H05",
+          "split": "holdout",
+          "stage": "before",
+          "got": "RECORDED_MATCH",
+          "expected": "NOT_MATCHING_THIS_NOTICE",
+          "affected": false,
+          "category": "same_brand_other_product",
+          "rationale": "Same brand, different product (purée pomme poire) with a GTIN not in the notice, even though its lot code K100 coincides."
+        },
+        {
+          "id": "H06",
+          "split": "holdout",
+          "stage": "before",
+          "got": "RECORDED_MATCH",
+          "expected": "NOT_MATCHING_THIS_NOTICE",
+          "affected": false,
+          "category": "other_brand_similar_name",
+          "rationale": "Different brand with a similar product name and GTIN not in the notice."
+        },
+        {
+          "id": "H07",
+          "split": "holdout",
+          "stage": "before",
+          "got": "RECORDED_MATCH",
+          "expected": "NOT_MATCHING_THIS_NOTICE",
+          "affected": false,
+          "category": "lot_not_listed",
+          "rationale": "GTIN ...441 is listed but lot K098 is not."
+        },
+        {
+          "id": "H08",
+          "split": "holdout",
+          "stage": "before",
+          "got": "RECORDED_MATCH",
+          "expected": "NOT_MATCHING_THIS_NOTICE",
+          "affected": false,
+          "category": "lot_under_other_gtin",
+          "rationale": "K099 is listed only under GTIN ...441, not ...458."
+        },
+        {
+          "id": "H10",
+          "split": "holdout",
+          "stage": "before",
+          "got": "RECORDED_MATCH",
+          "expected": "NEEDS_EVIDENCE",
+          "affected": false,
+          "category": "missing_gtin",
+          "rationale": "No GTIN or lot recorded; label shows GTIN ...441 lot K101, which is not listed for ...441."
+        },
+        {
+          "id": "H12",
+          "split": "holdout",
+          "stage": "before",
+          "got": "RECORDED_MATCH",
+          "expected": "NEEDS_EVIDENCE",
+          "affected": false,
+          "category": "missing_lot",
+          "rationale": "No lot recorded; label shows K103, not listed."
+        },
+        {
+          "id": "H13",
+          "split": "holdout",
+          "stage": "before",
+          "got": "RECORDED_MATCH",
+          "expected": "NOT_MATCHING_THIS_NOTICE",
+          "affected": false,
+          "category": "o0_lookalike_register",
+          "rationale": "Recorded lot 'K1OO' uses letter O; no O/0 substitution is ever made, so it does not equal k100. The label prints the same letters."
+        },
+        {
+          "id": "H14",
+          "split": "holdout",
+          "stage": "before",
+          "got": "RECORDED_MATCH",
+          "expected": "NEEDS_EVIDENCE",
+          "affected": false,
+          "category": "o0_lookalike_label",
+          "rationale": "No lot recorded; the label prints 'K1OO' with letter O. Read exactly, it is not a listed lot. Extraction should flag the O/0 ambiguity."
+        }
+      ],
+      "statuses": {
+        "D01": "RECORDED_MATCH",
+        "D02": "RECORDED_MATCH",
+        "D03": "RECORDED_MATCH",
+        "D04": "NOT_MATCHING_THIS_NOTICE",
+        "D05": "RECORDED_MATCH",
+        "D06": "RECORDED_MATCH",
+        "D07": "RECORDED_MATCH",
+        "D08": "RECORDED_MATCH",
+        "D09": "RECORDED_MATCH",
+        "D10": "RECORDED_MATCH",
+        "D11": "RECORDED_MATCH",
+        "D12": "RECORDED_MATCH",
+        "H01": "RECORDED_MATCH",
+        "H02": "RECORDED_MATCH",
+        "H03": "RECORDED_MATCH",
+        "H04": "RECORDED_MATCH",
+        "H05": "RECORDED_MATCH",
+        "H06": "RECORDED_MATCH",
+        "H07": "RECORDED_MATCH",
+        "H08": "RECORDED_MATCH",
+        "H09": "RECORDED_MATCH",
+        "H10": "RECORDED_MATCH",
+        "H11": "RECORDED_MATCH",
+        "H12": "RECORDED_MATCH",
+        "H13": "RECORDED_MATCH",
+        "H14": "RECORDED_MATCH",
+        "H15": "RECORDED_MATCH",
+        "H16": "RECORDED_MATCH",
+        "H17": "RECORDED_MATCH",
+        "H18": "RECORDED_MATCH"
+      }
+    },
+    "structured": {
+      "metrics": {
+        "dev": {
+          "uniqueCases": 11,
+          "affected": 7,
+          "declaredRecordedMatch": 4,
+          "needsEvidence": 4,
+          "recordedMatchPrecision": {
+            "n": 4,
+            "d": 4,
+            "pct": 100
+          },
+          "triageRecall": {
+            "n": 7,
+            "d": 7,
+            "pct": 100
+          },
+          "confirmedMatchRecall": {
+            "n": 4,
+            "d": 7,
+            "pct": 57.1
+          },
+          "incorrectExclusionRate": {
+            "n": 0,
+            "d": 7,
+            "pct": 0
+          },
+          "falseAlertRate": {
+            "n": 1,
+            "d": 4,
+            "pct": 25
+          },
+          "agreementWithExpected": {
+            "n": 11,
+            "d": 11,
+            "pct": 100
+          }
+        },
+        "holdout": {
+          "uniqueCases": 17,
+          "affected": 9,
+          "declaredRecordedMatch": 3,
+          "needsEvidence": 8,
+          "recordedMatchPrecision": {
+            "n": 3,
+            "d": 3,
+            "pct": 100
+          },
+          "triageRecall": {
+            "n": 8,
+            "d": 9,
+            "pct": 88.9
+          },
+          "confirmedMatchRecall": {
+            "n": 3,
+            "d": 9,
+            "pct": 33.3
+          },
+          "incorrectExclusionRate": {
+            "n": 1,
+            "d": 9,
+            "pct": 11.1
+          },
+          "falseAlertRate": {
+            "n": 3,
+            "d": 8,
+            "pct": 37.5
+          },
+          "agreementWithExpected": {
+            "n": 17,
+            "d": 17,
+            "pct": 100
+          }
+        },
+        "overall": {
+          "uniqueCases": 28,
+          "affected": 16,
+          "declaredRecordedMatch": 7,
+          "needsEvidence": 12,
+          "recordedMatchPrecision": {
+            "n": 7,
+            "d": 7,
+            "pct": 100
+          },
+          "triageRecall": {
+            "n": 15,
+            "d": 16,
+            "pct": 93.8
+          },
+          "confirmedMatchRecall": {
+            "n": 7,
+            "d": 16,
+            "pct": 43.8
+          },
+          "incorrectExclusionRate": {
+            "n": 1,
+            "d": 16,
+            "pct": 6.3
+          },
+          "falseAlertRate": {
+            "n": 4,
+            "d": 12,
+            "pct": 33.3
+          },
+          "agreementWithExpected": {
+            "n": 28,
+            "d": 28,
+            "pct": 100
+          }
+        }
+      },
+      "duplicates": {
+        "copies": 2,
+        "sameStatusAsOriginal": {
+          "n": 2,
+          "d": 2,
+          "pct": 100
+        },
+        "detectedAsDuplicate": {
+          "n": 0,
+          "d": 2,
+          "pct": 0
+        },
+        "details": [
+          {
+            "id": "D12",
+            "duplicateOf": "D01",
+            "status": "RECORDED_MATCH",
+            "originalStatus": "RECORDED_MATCH"
+          },
+          {
+            "id": "H18",
+            "duplicateOf": "H11",
+            "status": "NEEDS_EVIDENCE",
+            "originalStatus": "NEEDS_EVIDENCE"
+          }
+        ]
+      },
+      "failures": [
+        {
+          "id": "H04",
+          "split": "holdout",
+          "stage": "before",
+          "got": "NOT_MATCHING_THIS_NOTICE",
+          "expected": "NOT_MATCHING_THIS_NOTICE",
+          "affected": true,
+          "category": "register_transcription_error",
+          "rationale": "Register says K102 (not listed) but the physical label is K101 (listed). Register-only interpretation is not matching; nothing in the register prompts a photo. Deliberate trap showing the limit of register data."
+        }
+      ],
+      "statuses": {
+        "D01": "RECORDED_MATCH",
+        "D02": "RECORDED_MATCH",
+        "D03": "RECORDED_MATCH",
+        "D04": "NOT_MATCHING_THIS_NOTICE",
+        "D05": "NOT_MATCHING_THIS_NOTICE",
+        "D06": "NOT_MATCHING_THIS_NOTICE",
+        "D07": "NEEDS_EVIDENCE",
+        "D08": "NEEDS_EVIDENCE",
+        "D09": "NEEDS_EVIDENCE",
+        "D10": "RECORDED_MATCH",
+        "D11": "NEEDS_EVIDENCE",
+        "D12": "RECORDED_MATCH",
+        "H01": "RECORDED_MATCH",
+        "H02": "RECORDED_MATCH",
+        "H03": "RECORDED_MATCH",
+        "H04": "NOT_MATCHING_THIS_NOTICE",
+        "H05": "NOT_MATCHING_THIS_NOTICE",
+        "H06": "NOT_MATCHING_THIS_NOTICE",
+        "H07": "NOT_MATCHING_THIS_NOTICE",
+        "H08": "NOT_MATCHING_THIS_NOTICE",
+        "H09": "NEEDS_EVIDENCE",
+        "H10": "NEEDS_EVIDENCE",
+        "H11": "NEEDS_EVIDENCE",
+        "H12": "NEEDS_EVIDENCE",
+        "H13": "NOT_MATCHING_THIS_NOTICE",
+        "H14": "NEEDS_EVIDENCE",
+        "H15": "NEEDS_EVIDENCE",
+        "H16": "NEEDS_EVIDENCE",
+        "H17": "NEEDS_EVIDENCE",
+        "H18": "NEEDS_EVIDENCE"
+      },
+      "details": {
+        "D01": {
+          "status": "RECORDED_MATCH",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_LISTED",
+            "DATE_CONFIRMED"
+          ],
+          "missingFields": []
+        },
+        "D02": {
+          "status": "RECORDED_MATCH",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_LISTED",
+            "DATE_CONFIRMED"
+          ],
+          "missingFields": []
+        },
+        "D03": {
+          "status": "RECORDED_MATCH",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_LISTED",
+            "DATE_CONFIRMED"
+          ],
+          "missingFields": []
+        },
+        "D04": {
+          "status": "NOT_MATCHING_THIS_NOTICE",
+          "reasons": [
+            "GTIN_NOT_IN_NOTICE"
+          ],
+          "missingFields": []
+        },
+        "D05": {
+          "status": "NOT_MATCHING_THIS_NOTICE",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_NOT_LISTED"
+          ],
+          "missingFields": []
+        },
+        "D06": {
+          "status": "NOT_MATCHING_THIS_NOTICE",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_NOT_LISTED",
+            "LOT_LISTED_UNDER_OTHER_GTIN_ONLY"
+          ],
+          "missingFields": []
+        },
+        "D07": {
+          "status": "NEEDS_EVIDENCE",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_MISSING"
+          ],
+          "missingFields": [
+            "lot",
+            "best_before"
+          ]
+        },
+        "D08": {
+          "status": "NEEDS_EVIDENCE",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_MISSING"
+          ],
+          "missingFields": [
+            "lot"
+          ]
+        },
+        "D09": {
+          "status": "NEEDS_EVIDENCE",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_MISSING"
+          ],
+          "missingFields": [
+            "lot",
+            "best_before"
+          ]
+        },
+        "D10": {
+          "status": "RECORDED_MATCH",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_LISTED",
+            "DATE_NOT_RECORDED"
+          ],
+          "missingFields": []
+        },
+        "D11": {
+          "status": "NEEDS_EVIDENCE",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_LISTED",
+            "DATE_CONFLICT"
+          ],
+          "missingFields": [
+            "best_before"
+          ]
+        },
+        "D12": {
+          "status": "RECORDED_MATCH",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_LISTED",
+            "DATE_CONFIRMED"
+          ],
+          "missingFields": []
+        },
+        "H01": {
+          "status": "RECORDED_MATCH",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_LISTED",
+            "DATE_CONFIRMED"
+          ],
+          "missingFields": []
+        },
+        "H02": {
+          "status": "RECORDED_MATCH",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_LISTED",
+            "DATE_CONFIRMED"
+          ],
+          "missingFields": []
+        },
+        "H03": {
+          "status": "RECORDED_MATCH",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_LISTED",
+            "DATE_CONFIRMED"
+          ],
+          "missingFields": []
+        },
+        "H04": {
+          "status": "NOT_MATCHING_THIS_NOTICE",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_NOT_LISTED"
+          ],
+          "missingFields": []
+        },
+        "H05": {
+          "status": "NOT_MATCHING_THIS_NOTICE",
+          "reasons": [
+            "GTIN_NOT_IN_NOTICE"
+          ],
+          "missingFields": []
+        },
+        "H06": {
+          "status": "NOT_MATCHING_THIS_NOTICE",
+          "reasons": [
+            "GTIN_NOT_IN_NOTICE"
+          ],
+          "missingFields": []
+        },
+        "H07": {
+          "status": "NOT_MATCHING_THIS_NOTICE",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_NOT_LISTED"
+          ],
+          "missingFields": []
+        },
+        "H08": {
+          "status": "NOT_MATCHING_THIS_NOTICE",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_NOT_LISTED",
+            "LOT_LISTED_UNDER_OTHER_GTIN_ONLY"
+          ],
+          "missingFields": []
+        },
+        "H09": {
+          "status": "NEEDS_EVIDENCE",
+          "reasons": [
+            "GTIN_MISSING"
+          ],
+          "missingFields": [
+            "gtin"
+          ]
+        },
+        "H10": {
+          "status": "NEEDS_EVIDENCE",
+          "reasons": [
+            "GTIN_MISSING"
+          ],
+          "missingFields": [
+            "gtin"
+          ]
+        },
+        "H11": {
+          "status": "NEEDS_EVIDENCE",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_MISSING"
+          ],
+          "missingFields": [
+            "lot",
+            "best_before"
+          ]
+        },
+        "H12": {
+          "status": "NEEDS_EVIDENCE",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_MISSING"
+          ],
+          "missingFields": [
+            "lot",
+            "best_before"
+          ]
+        },
+        "H13": {
+          "status": "NOT_MATCHING_THIS_NOTICE",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_NOT_LISTED"
+          ],
+          "missingFields": []
+        },
+        "H14": {
+          "status": "NEEDS_EVIDENCE",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_MISSING"
+          ],
+          "missingFields": [
+            "lot",
+            "best_before"
+          ]
+        },
+        "H15": {
+          "status": "NEEDS_EVIDENCE",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_LISTED",
+            "DATE_CONFLICT"
+          ],
+          "missingFields": [
+            "best_before"
+          ]
+        },
+        "H16": {
+          "status": "NEEDS_EVIDENCE",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_LISTED",
+            "DATE_CONFLICT"
+          ],
+          "missingFields": [
+            "best_before"
+          ]
+        },
+        "H17": {
+          "status": "NEEDS_EVIDENCE",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_MISSING"
+          ],
+          "missingFields": [
+            "lot"
+          ]
+        },
+        "H18": {
+          "status": "NEEDS_EVIDENCE",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_MISSING"
+          ],
+          "missingFields": [
+            "lot",
+            "best_before"
+          ]
+        }
+      }
+    },
+    "investigation": {
+      "ran": true,
+      "budgetStopped": false,
+      "before": {
+        "dev": {
+          "uniqueCases": 11,
+          "affected": 7,
+          "declaredRecordedMatch": 4,
+          "needsEvidence": 4,
+          "recordedMatchPrecision": {
+            "n": 4,
+            "d": 4,
+            "pct": 100
+          },
+          "triageRecall": {
+            "n": 7,
+            "d": 7,
+            "pct": 100
+          },
+          "confirmedMatchRecall": {
+            "n": 4,
+            "d": 7,
+            "pct": 57.1
+          },
+          "incorrectExclusionRate": {
+            "n": 0,
+            "d": 7,
+            "pct": 0
+          },
+          "falseAlertRate": {
+            "n": 1,
+            "d": 4,
+            "pct": 25
+          },
+          "agreementWithExpected": {
+            "n": 11,
+            "d": 11,
+            "pct": 100
+          }
+        },
+        "holdout": {
+          "uniqueCases": 17,
+          "affected": 9,
+          "declaredRecordedMatch": 3,
+          "needsEvidence": 8,
+          "recordedMatchPrecision": {
+            "n": 3,
+            "d": 3,
+            "pct": 100
+          },
+          "triageRecall": {
+            "n": 8,
+            "d": 9,
+            "pct": 88.9
+          },
+          "confirmedMatchRecall": {
+            "n": 3,
+            "d": 9,
+            "pct": 33.3
+          },
+          "incorrectExclusionRate": {
+            "n": 1,
+            "d": 9,
+            "pct": 11.1
+          },
+          "falseAlertRate": {
+            "n": 3,
+            "d": 8,
+            "pct": 37.5
+          },
+          "agreementWithExpected": {
+            "n": 17,
+            "d": 17,
+            "pct": 100
+          }
+        },
+        "overall": {
+          "uniqueCases": 28,
+          "affected": 16,
+          "declaredRecordedMatch": 7,
+          "needsEvidence": 12,
+          "recordedMatchPrecision": {
+            "n": 7,
+            "d": 7,
+            "pct": 100
+          },
+          "triageRecall": {
+            "n": 15,
+            "d": 16,
+            "pct": 93.8
+          },
+          "confirmedMatchRecall": {
+            "n": 7,
+            "d": 16,
+            "pct": 43.8
+          },
+          "incorrectExclusionRate": {
+            "n": 1,
+            "d": 16,
+            "pct": 6.3
+          },
+          "falseAlertRate": {
+            "n": 4,
+            "d": 12,
+            "pct": 33.3
+          },
+          "agreementWithExpected": {
+            "n": 28,
+            "d": 28,
+            "pct": 100
+          }
+        }
+      },
+      "after": {
+        "dev": {
+          "uniqueCases": 11,
+          "affected": 7,
+          "declaredRecordedMatch": 6,
+          "needsEvidence": 1,
+          "recordedMatchPrecision": {
+            "n": 6,
+            "d": 6,
+            "pct": 100
+          },
+          "triageRecall": {
+            "n": 7,
+            "d": 7,
+            "pct": 100
+          },
+          "confirmedMatchRecall": {
+            "n": 6,
+            "d": 7,
+            "pct": 85.7
+          },
+          "incorrectExclusionRate": {
+            "n": 0,
+            "d": 7,
+            "pct": 0
+          },
+          "falseAlertRate": {
+            "n": 0,
+            "d": 4,
+            "pct": 0
+          },
+          "agreementWithExpected": {
+            "n": 11,
+            "d": 11,
+            "pct": 100
+          }
+        },
+        "holdout": {
+          "uniqueCases": 17,
+          "affected": 9,
+          "declaredRecordedMatch": 5,
+          "needsEvidence": 4,
+          "recordedMatchPrecision": {
+            "n": 5,
+            "d": 5,
+            "pct": 100
+          },
+          "triageRecall": {
+            "n": 8,
+            "d": 9,
+            "pct": 88.9
+          },
+          "confirmedMatchRecall": {
+            "n": 5,
+            "d": 9,
+            "pct": 55.6
+          },
+          "incorrectExclusionRate": {
+            "n": 1,
+            "d": 9,
+            "pct": 11.1
+          },
+          "falseAlertRate": {
+            "n": 1,
+            "d": 8,
+            "pct": 12.5
+          },
+          "agreementWithExpected": {
+            "n": 15,
+            "d": 17,
+            "pct": 88.2
+          }
+        },
+        "overall": {
+          "uniqueCases": 28,
+          "affected": 16,
+          "declaredRecordedMatch": 11,
+          "needsEvidence": 5,
+          "recordedMatchPrecision": {
+            "n": 11,
+            "d": 11,
+            "pct": 100
+          },
+          "triageRecall": {
+            "n": 15,
+            "d": 16,
+            "pct": 93.8
+          },
+          "confirmedMatchRecall": {
+            "n": 11,
+            "d": 16,
+            "pct": 68.8
+          },
+          "incorrectExclusionRate": {
+            "n": 1,
+            "d": 16,
+            "pct": 6.3
+          },
+          "falseAlertRate": {
+            "n": 1,
+            "d": 12,
+            "pct": 8.3
+          },
+          "agreementWithExpected": {
+            "n": 26,
+            "d": 28,
+            "pct": 92.9
+          }
+        }
+      },
+      "duplicates": {
+        "copies": 2,
+        "sameStatusAsOriginal": {
+          "n": 2,
+          "d": 2,
+          "pct": 100
+        },
+        "detectedAsDuplicate": {
+          "n": 0,
+          "d": 2,
+          "pct": 0
+        },
+        "details": [
+          {
+            "id": "D12",
+            "duplicateOf": "D01",
+            "status": "RECORDED_MATCH",
+            "originalStatus": "RECORDED_MATCH"
+          },
+          {
+            "id": "H18",
+            "duplicateOf": "H11",
+            "status": "RECORDED_MATCH",
+            "originalStatus": "RECORDED_MATCH"
+          }
+        ]
+      },
+      "failuresBefore": [
+        {
+          "id": "H04",
+          "split": "holdout",
+          "stage": "before",
+          "got": "NOT_MATCHING_THIS_NOTICE",
+          "expected": "NOT_MATCHING_THIS_NOTICE",
+          "affected": true,
+          "category": "register_transcription_error",
+          "rationale": "Register says K102 (not listed) but the physical label is K101 (listed). Register-only interpretation is not matching; nothing in the register prompts a photo. Deliberate trap showing the limit of register data."
+        }
+      ],
+      "failuresAfter": [
+        {
+          "id": "H04",
+          "split": "holdout",
+          "stage": "after",
+          "got": "NOT_MATCHING_THIS_NOTICE",
+          "expected": "NOT_MATCHING_THIS_NOTICE",
+          "affected": true,
+          "category": "register_transcription_error",
+          "rationale": "Register says K102 (not listed) but the physical label is K101 (listed). Register-only interpretation is not matching; nothing in the register prompts a photo. Deliberate trap showing the limit of register data."
+        },
+        {
+          "id": "H09",
+          "split": "holdout",
+          "stage": "after",
+          "got": "NEEDS_EVIDENCE",
+          "expected": "RECORDED_MATCH",
+          "affected": true,
+          "category": "missing_gtin",
+          "rationale": "No GTIN recorded (brand in name, lot/date recorded); label shows GTIN ...458, so K100 10/12/2026 is a listed entry."
+        },
+        {
+          "id": "H10",
+          "split": "holdout",
+          "stage": "after",
+          "got": "NEEDS_EVIDENCE",
+          "expected": "NOT_MATCHING_THIS_NOTICE",
+          "affected": false,
+          "category": "missing_gtin",
+          "rationale": "No GTIN or lot recorded; label shows GTIN ...441 lot K101, which is not listed for ...441."
+        }
+      ],
+      "statuses": {
+        "D01": "RECORDED_MATCH",
+        "D02": "RECORDED_MATCH",
+        "D03": "RECORDED_MATCH",
+        "D04": "NOT_MATCHING_THIS_NOTICE",
+        "D05": "NOT_MATCHING_THIS_NOTICE",
+        "D06": "NOT_MATCHING_THIS_NOTICE",
+        "D07": "RECORDED_MATCH",
+        "D08": "RECORDED_MATCH",
+        "D09": "NOT_MATCHING_THIS_NOTICE",
+        "D10": "RECORDED_MATCH",
+        "D11": "NEEDS_EVIDENCE",
+        "D12": "RECORDED_MATCH",
+        "H01": "RECORDED_MATCH",
+        "H02": "RECORDED_MATCH",
+        "H03": "RECORDED_MATCH",
+        "H04": "NOT_MATCHING_THIS_NOTICE",
+        "H05": "NOT_MATCHING_THIS_NOTICE",
+        "H06": "NOT_MATCHING_THIS_NOTICE",
+        "H07": "NOT_MATCHING_THIS_NOTICE",
+        "H08": "NOT_MATCHING_THIS_NOTICE",
+        "H09": "NEEDS_EVIDENCE",
+        "H10": "NEEDS_EVIDENCE",
+        "H11": "RECORDED_MATCH",
+        "H12": "NOT_MATCHING_THIS_NOTICE",
+        "H13": "NOT_MATCHING_THIS_NOTICE",
+        "H14": "NOT_MATCHING_THIS_NOTICE",
+        "H15": "NEEDS_EVIDENCE",
+        "H16": "NEEDS_EVIDENCE",
+        "H17": "RECORDED_MATCH",
+        "H18": "RECORDED_MATCH"
+      },
+      "evidence": {
+        "initiallyUnresolvedUnique": 12,
+        "evidenceResolution": {
+          "dev": {
+            "n": 3,
+            "d": 3,
+            "pct": 100
+          },
+          "holdout": {
+            "n": 4,
+            "d": 6,
+            "pct": 66.7
+          },
+          "overall": {
+            "n": 7,
+            "d": 9,
+            "pct": 77.8
+          }
+        },
+        "insufficientKeptOpen": {
+          "n": 3,
+          "d": 3,
+          "pct": 100
+        },
+        "requestedExactly": {
+          "n": 13,
+          "d": 13,
+          "pct": 100
+        },
+        "requestMismatches": [],
+        "unconfirmedExtractionKeptStatus": {
+          "n": 13,
+          "d": 13,
+          "pct": 100
+        },
+        "extraction": {
+          "gtin": {
+            "n": 13,
+            "d": 13,
+            "pct": 100
+          },
+          "lot": {
+            "n": 13,
+            "d": 13,
+            "pct": 100
+          },
+          "lotCaseInsensitive": {
+            "n": 13,
+            "d": 13,
+            "pct": 100
+          },
+          "bestBefore": {
+            "n": 13,
+            "d": 13,
+            "pct": 100
+          },
+          "mismatches": []
+        },
+        "ambiguityFlags": [
+          {
+            "id": "D07",
+            "flags": [
+              {
+                "field": "lot_text",
+                "detail": "The two characters after '1' in 'K100' could be zeros (0) or the letter O."
+              }
+            ]
+          },
+          {
+            "id": "D08",
+            "flags": [
+              {
+                "field": "lot_text",
+                "detail": "The character after 'K' could be read as letter O or digit 0 ('K099' vs 'KO99')."
+              }
+            ]
+          },
+          {
+            "id": "D09",
+            "flags": [
+              {
+                "field": "lot_text",
+                "detail": "The '0' in K102 could be read as the letter 'O'."
+              }
+            ]
+          },
+          {
+            "id": "D11",
+            "flags": [
+              {
+                "field": "lot_text",
+                "detail": "The characters after 'K1' could be read as zeros '00' or letter O's 'OO'."
+              },
+              {
+                "field": "lot_text",
+                "detail": "The '1' in 'K100' could be read as the letter 'I'."
+              }
+            ]
+          },
+          {
+            "id": "H09",
+            "flags": [
+              {
+                "field": "lot_text",
+                "detail": "The two characters after '1' in 'K100' could be read as digit zero (0) or letter O."
+              }
+            ]
+          },
+          {
+            "id": "H10",
+            "flags": [
+              {
+                "field": "lot_text",
+                "detail": "Characters '1' and '0' in K101 could possibly be read as 'I' and 'O' in this bold sans-serif font."
+              }
+            ]
+          },
+          {
+            "id": "H11",
+            "flags": [
+              {
+                "field": "lot_text",
+                "detail": "The characters after K in 'K100' could be read as digits 1-0-0 or as letters I-O-O; transcribed as printed digits 100."
+              }
+            ]
+          },
+          {
+            "id": "H12",
+            "flags": [
+              {
+                "field": "lot_text",
+                "detail": "The '0' in K103 could be read as the letter 'O'."
+              }
+            ]
+          },
+          {
+            "id": "H14",
+            "flags": [
+              {
+                "field": "lot_text",
+                "detail": "The last two characters of 'K1OO' look like the letter O but could be the digit 0 (K100)."
+              },
+              {
+                "field": "lot_text",
+                "detail": "The second character looks like the digit 1 but could be the letter I or l."
+              }
+            ]
+          },
+          {
+            "id": "H15",
+            "flags": [
+              {
+                "field": "lot_text",
+                "detail": "Characters after K could be read as '101' or 'I0I'/'1O1' (1 vs I, 0 vs O)."
+              }
+            ]
+          },
+          {
+            "id": "H16",
+            "flags": [
+              {
+                "field": "lot_text",
+                "detail": "Characters after K could be read as 1-0-1 or I-O-I/l-O-l."
+              }
+            ]
+          },
+          {
+            "id": "H17",
+            "flags": [
+              {
+                "field": "lot_text",
+                "detail": "Characters after K could be read as '101' or 'I0I'/'1O1' (1 vs I, 0 vs O)."
+              }
+            ]
+          },
+          {
+            "id": "H18",
+            "flags": [
+              {
+                "field": "lot_text",
+                "detail": "The characters after K could be read as '100' (digits) or 'IOO'/'1OO' (letters I/O); transcribed as printed appearance 'K100'."
+              }
+            ]
+          }
+        ],
+        "humanTouches": {
+          "kitchenUploads": 13,
+          "managerConfirmations": 13,
+          "total": 26,
+          "casesTouched": 13
+        },
+        "duplicateEvidenceRequests": 1,
+        "segmentFailures": []
+      },
+      "usage": {
+        "segments": 39,
+        "costUsd": 2.3895,
+        "costPerInvestigatedCaseUsd": 0.1838,
+        "tokens": {
+          "input": 421261,
+          "output": 35222,
+          "cacheRead": 0,
+          "cacheWrite": 0
+        },
+        "extractionTokens": {
+          "input": 26273,
+          "output": 2475
+        },
+        "wallClockMsTotal": 660722,
+        "wallClockMsPerCase": {
+          "mean": 50825,
+          "min": 41158,
+          "max": 71363
+        },
+        "segmentMs": {
+          "mean": 15384,
+          "max": 28387
+        },
+        "modelsObserved": [
+          "claude-opus-5-5"
+        ]
+      },
+      "cases": [
+        {
+          "id": "D07",
+          "ran": true,
+          "skippedReason": null,
+          "expectedRequestFields": [
+            "lot",
+            "best_before"
+          ],
+          "requestedFields": [
+            "lot",
+            "best_before"
+          ],
+          "requestedExactly": true,
+          "segments": [
+            {
+              "trigger": "manual",
+              "runStatus": "NEEDS_EVIDENCE",
+              "errorCategory": null,
+              "caseStatusAfter": "NEEDS_EVIDENCE",
+              "tools": [
+                "get_recall_scope",
+                "get_delivery_record",
+                "get_case_evidence",
+                "evaluate_match",
+                "request_evidence",
+                "finish_investigation"
+              ],
+              "elapsedMs": 19306,
+              "costUsd": 0.0537,
+              "tokens": {
+                "input": 9965,
+                "output": 692,
+                "cacheRead": 0,
+                "cacheWrite": 0
+              },
+              "model": "claude-opus-5-5",
+              "summary": "The recorded delivery (delivery:EVAL-DL-007, 24 gourdes received 2026-04-24) has GTIN 4056489470458, which appears in notice:2026-04-0331#entry1 (lot K100, BB 2026-12-10) and notice:2026-04-0331#entry2 (lot K101, BB 2026-12-11). No lot or best-before date was recorded and no label photos exist, so the matcher returned NEEDS_EVIDENCE (GTIN_IN_NOTICE, LOT_MISSING). A label photo showing lot and best-before has been requested from the kitchen; the delivery record does not establish current stock. [refs: notice:2026-04-0331, notice:2026-04-0331#entry1, notice:2026-04-0331#entry2, delivery:EVAL-DL-007] [next: await_label_photo]"
+            },
+            {
+              "trigger": "evidence_uploaded",
+              "runStatus": "NEEDS_EVIDENCE",
+              "errorCategory": null,
+              "caseStatusAfter": "NEEDS_EVIDENCE",
+              "tools": [
+                "get_recall_scope",
+                "get_delivery_record",
+                "get_case_evidence",
+                "extract_label",
+                "evaluate_match",
+                "finish_investigation",
+                "finish_investigation"
+              ],
+              "elapsedMs": 20888,
+              "costUsd": 0.090224,
+              "tokens": {
+                "input": 14736,
+                "output": 1564,
+                "cacheRead": 0,
+                "cacheWrite": 0
+              },
+              "model": "claude-opus-5-5",
+              "summary": "Delivery delivery:EVAL-DL-007 has GTIN 4056489470458, listed in notice:2026-04-0331#entry1 (K100, BB 2026-12-10) and #entry2 (K101, BB 2026-12-11). Lot and best-before are missing in the register, so the matcher returns NEEDS_EVIDENCE. The photo document:25f9ab78-394a-4171-b8bc-b0288a36ca16 reads lot \"K100\", BB 10/12/2026 in extraction:ba507c93-16fc-490d-bc3a-b257864a87f6. These values are UNCONFIRMED, and 0 vs letter O in the lot is flagged as ambiguous. A person must confirm lot and BB against the photo. The delivery record does not prove current stock. [refs: notice:2026-04-0331, notice:2026-04-0331#entry1, notice:2026-04-0331#entry2, delivery:EVAL-DL-007, document:25f9ab78-394a-4171-b8bc-b0288a36ca16, extraction:ba507c93-16fc-490d-bc3a-b257864a87f6] [next: await_human_confirmation]"
+            },
+            {
+              "trigger": "evidence_confirmed",
+              "runStatus": "COMPLETED",
+              "errorCategory": null,
+              "caseStatusAfter": "RECORDED_MATCH",
+              "tools": [
+                "get_recall_scope",
+                "get_delivery_record",
+                "get_case_evidence",
+                "evaluate_match",
+                "finish_investigation"
+              ],
+              "elapsedMs": 17104,
+              "costUsd": 0.052044,
+              "tokens": {
+                "input": 9796,
+                "output": 643,
+                "cacheRead": 0,
+                "cacheWrite": 0
+              },
+              "model": "claude-opus-5-5",
+              "summary": "Delivery delivery:EVAL-DL-007 (GTIN 4056489470458) together with the human-confirmed lot K100 (evidence:bd1d110e-cb83-4b7d-8cce-51a1d4889f05) and best-before 10/12/2026 (evidence:ad722d8b-0abc-4da2-9a91-95b0541365c3) matches notice:2026-04-0331#entry1 exactly; the matcher returned RECORDED_MATCH (GTIN_IN_NOTICE, LOT_LISTED, DATE_CONFIRMED). The delivery record does not prove current stock, and any staff report of removal is not independent proof of removal. Manager review is needed to locate and handle any remaining units under notice:2026-04-0331. [refs: notice:2026-04-0331, notice:2026-04-0331#entry1, delivery:EVAL-DL-007, evidence:bd1d110e-cb83-4b7d-8cce-51a1d4889f05, evidence:ad722d8b-0abc-4da2-9a91-95b0541365c3, document:25f9ab78-394a-4171-b8bc-b0288a36ca16] [next: manager_review]"
+            }
+          ],
+          "extraction": {
+            "status": "COMPLETED",
+            "model": "claude-opus-5-5",
+            "fields": {
+              "gtin_digits": "4056489470458",
+              "lot_text": "K100",
+              "best_before_text": "10/12/2026",
+              "legible": true
+            },
+            "ambiguous": [
+              {
+                "field": "lot_text",
+                "detail": "The two characters after '1' in 'K100' could be zeros (0) or the letter O."
+              }
+            ],
+            "correct": {
+              "gtin": true,
+              "lot": true,
+              "lotCaseInsensitive": true,
+              "bestBefore": true
+            },
+            "tokens": {
+              "input": 2021,
+              "output": 175
+            },
+            "elapsedMs": 3168
+          },
+          "statusAfterUnconfirmedExtraction": "NEEDS_EVIDENCE",
+          "confirmation": {
+            "lot": "K100",
+            "bestBefore": "10/12/2026",
+            "error": null,
+            "method": [
+              "best_before:ai_extraction_confirmed_by_human",
+              "lot:ai_extraction_confirmed_by_human"
+            ]
+          },
+          "humanTouches": {
+            "kitchenUpload": 1,
+            "managerConfirmation": 1
+          },
+          "finalStatus": "RECORDED_MATCH",
+          "finalReasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_LISTED",
+            "DATE_CONFIRMED"
+          ],
+          "wallClockMs": 62362,
+          "costUsd": 0.195968,
+          "errors": []
+        },
+        {
+          "id": "D08",
+          "ran": true,
+          "skippedReason": null,
+          "expectedRequestFields": [
+            "lot"
+          ],
+          "requestedFields": [
+            "lot"
+          ],
+          "requestedExactly": true,
+          "segments": [
+            {
+              "trigger": "manual",
+              "runStatus": "NEEDS_EVIDENCE",
+              "errorCategory": null,
+              "caseStatusAfter": "NEEDS_EVIDENCE",
+              "tools": [
+                "get_recall_scope",
+                "get_delivery_record",
+                "get_case_evidence",
+                "evaluate_match",
+                "request_evidence",
+                "finish_investigation"
+              ],
+              "elapsedMs": 12340,
+              "costUsd": 0.052112,
+              "tokens": {
+                "input": 9953,
+                "output": 615,
+                "cacheRead": 0,
+                "cacheWrite": 0
+              },
+              "model": "claude-opus-5-5",
+              "summary": "The recorded delivery (delivery:EVAL-DL-008) is GTIN 4056489470441 with best before 09/12/2026. That GTIN is listed in the notice, and the date lines up with notice:2026-04-0331#entry3 (lot K099). The register has no lot code, so the deterministic matcher returned NEEDS_EVIDENCE with lot missing. A label photo showing the lot has been requested from the kitchen. The delivery record does not prove the product is still in stock. [refs: notice:2026-04-0331, notice:2026-04-0331#entry3, notice:2026-04-0331#entry4, delivery:EVAL-DL-008] [next: await_label_photo]"
+            },
+            {
+              "trigger": "evidence_uploaded",
+              "runStatus": "NEEDS_EVIDENCE",
+              "errorCategory": null,
+              "caseStatusAfter": "NEEDS_EVIDENCE",
+              "tools": [
+                "get_recall_scope",
+                "get_delivery_record",
+                "get_case_evidence",
+                "extract_label",
+                "evaluate_match",
+                "finish_investigation"
+              ],
+              "elapsedMs": 14722,
+              "costUsd": 0.061604,
+              "tokens": {
+                "input": 10336,
+                "output": 1013,
+                "cacheRead": 0,
+                "cacheWrite": 0
+              },
+              "model": "claude-opus-5-5",
+              "summary": "The recorded delivery (delivery:EVAL-DL-008) has GTIN 4056489470441, which is listed in the notice, and best before 09/12/2026. The register has no lot code, so the matcher still returns NEEDS_EVIDENCE because the lot is missing. The uploaded label photo (document:fd66e5d0-89ca-4238-b72d-745ec13c0c49) has been transcribed (extraction:d3fe38c2-5f3e-4855-86d6-61f6db0ff1cc). The unconfirmed reading is lot \"K099\" with best before 09/12/2026, which would correspond to notice:2026-04-0331#entry3. However, the extraction flags that the character after \"K\" could be the digit 0 or the letter O, and the notice allows no substitutions, so a person must check the exact lot against the photo and confirm it before the matcher can use it. The delivery record does not prove the product is still in stock. [refs: notice:2026-04-0331, notice:2026-04-0331#entry3, delivery:EVAL-DL-008, document:fd66e5d0-89ca-4238-b72d-745ec13c0c49, extraction:d3fe38c2-5f3e-4855-86d6-61f6db0ff1cc] [next: await_human_confirmation]"
+            },
+            {
+              "trigger": "evidence_confirmed",
+              "runStatus": "COMPLETED",
+              "errorCategory": null,
+              "caseStatusAfter": "RECORDED_MATCH",
+              "tools": [
+                "get_recall_scope",
+                "get_delivery_record",
+                "get_case_evidence",
+                "evaluate_match",
+                "finish_investigation"
+              ],
+              "elapsedMs": 10424,
+              "costUsd": 0.051832,
+              "tokens": {
+                "input": 9808,
+                "output": 630,
+                "cacheRead": 0,
+                "cacheWrite": 0
+              },
+              "model": "claude-opus-5-5",
+              "summary": "The recorded delivery (delivery:EVAL-DL-008) has GTIN 4056489470441 and best before 09/12/2026. The lot K099 was confirmed by a person from the label photo (evidence:87503582-c895-4053-a6df-0ad4dde0b79e; document:fd66e5d0-89ca-4238-b72d-745ec13c0c49), and the best before was also confirmed (evidence:2f014bc1-84d7-4f32-8d6e-a7131c54b2b7). The deterministic matcher returns RECORDED_MATCH against notice:2026-04-0331#entry3. The delivery record does not prove the product is still in stock, so a manager should check stock and decide what to do in line with the notice. [refs: notice:2026-04-0331, notice:2026-04-0331#entry3, delivery:EVAL-DL-008, evidence:87503582-c895-4053-a6df-0ad4dde0b79e, evidence:2f014bc1-84d7-4f32-8d6e-a7131c54b2b7, document:fd66e5d0-89ca-4238-b72d-745ec13c0c49] [next: manager_review]"
+            }
+          ],
+          "extraction": {
+            "status": "COMPLETED",
+            "model": "claude-opus-5-5",
+            "fields": {
+              "gtin_digits": "4056489470441",
+              "lot_text": "K099",
+              "best_before_text": "09/12/2026",
+              "legible": true
+            },
+            "ambiguous": [
+              {
+                "field": "lot_text",
+                "detail": "The character after 'K' could be read as letter O or digit 0 ('K099' vs 'KO99')."
+              }
+            ],
+            "correct": {
+              "gtin": true,
+              "lot": true,
+              "lotCaseInsensitive": true,
+              "bestBefore": true
+            },
+            "tokens": {
+              "input": 2021,
+              "output": 196
+            },
+            "elapsedMs": 3011
+          },
+          "statusAfterUnconfirmedExtraction": "NEEDS_EVIDENCE",
+          "confirmation": {
+            "lot": "K099",
+            "bestBefore": "09/12/2026",
+            "error": null,
+            "method": [
+              "best_before:ai_extraction_confirmed_by_human",
+              "lot:ai_extraction_confirmed_by_human"
+            ]
+          },
+          "humanTouches": {
+            "kitchenUpload": 1,
+            "managerConfirmation": 1
+          },
+          "finalStatus": "RECORDED_MATCH",
+          "finalReasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_LISTED",
+            "DATE_CONFIRMED"
+          ],
+          "wallClockMs": 41158,
+          "costUsd": 0.165548,
+          "errors": []
+        },
+        {
+          "id": "D09",
+          "ran": true,
+          "skippedReason": null,
+          "expectedRequestFields": [
+            "lot",
+            "best_before"
+          ],
+          "requestedFields": [
+            "lot",
+            "best_before"
+          ],
+          "requestedExactly": true,
+          "segments": [
+            {
+              "trigger": "manual",
+              "runStatus": "NEEDS_EVIDENCE",
+              "errorCategory": null,
+              "caseStatusAfter": "NEEDS_EVIDENCE",
+              "tools": [
+                "get_recall_scope",
+                "get_delivery_record",
+                "get_case_evidence",
+                "evaluate_match",
+                "request_evidence",
+                "finish_investigation"
+              ],
+              "elapsedMs": 9770,
+              "costUsd": 0.039932,
+              "tokens": {
+                "input": 6953,
+                "output": 606,
+                "cacheRead": 0,
+                "cacheWrite": 0
+              },
+              "model": "claude-opus-5-5",
+              "summary": "The recorded delivery's GTIN 4056489470458 is listed in notice 2026-04-0331 (entry1: lot K100, best before 2026-12-10; entry2: lot K101, best before 2026-12-11). The register has no lot or best-before date, so the matcher returned NEEDS_EVIDENCE with lot and best_before missing. A label photo showing lot and best-before has been requested from the kitchen. The delivery record does not prove the product is still in stock. [refs: notice:2026-04-0331, notice:2026-04-0331#entry1, notice:2026-04-0331#entry2, delivery:EVAL-DL-009] [next: await_label_photo]"
+            },
+            {
+              "trigger": "evidence_uploaded",
+              "runStatus": "NEEDS_EVIDENCE",
+              "errorCategory": null,
+              "caseStatusAfter": "NEEDS_EVIDENCE",
+              "tools": [
+                "get_recall_scope",
+                "get_delivery_record",
+                "get_case_evidence",
+                "extract_label",
+                "evaluate_match",
+                "finish_investigation"
+              ],
+              "elapsedMs": 12460,
+              "costUsd": 0.05766,
+              "tokens": {
+                "input": 10275,
+                "output": 828,
+                "cacheRead": 0,
+                "cacheWrite": 0
+              },
+              "model": "claude-opus-5-5",
+              "summary": "The recorded delivery's GTIN 4056489470458 appears in notice 2026-04-0331 (entry1: lot K100, BB 2026-12-10; entry2: lot K101, BB 2026-12-11), but the register has no lot or best-before date, so the matcher still returns NEEDS_EVIDENCE. The uploaded label photo has been extracted with UNCONFIRMED values (lot \"K102\", where the 0 may be the letter O; best before 12/12/2026). These values cannot be used until a person checks them against the photo. A human must confirm lot and best-before before this case can be evaluated. The delivery record does not prove the product is still in stock. [refs: notice:2026-04-0331, notice:2026-04-0331#entry1, notice:2026-04-0331#entry2, delivery:EVAL-DL-009, document:6c7cca75-1e59-4f4b-9376-c547275a09d2, extraction:1f324787-7aeb-416c-b944-05abca41f233] [next: await_human_confirmation]"
+            },
+            {
+              "trigger": "evidence_confirmed",
+              "runStatus": "COMPLETED",
+              "errorCategory": null,
+              "caseStatusAfter": "NOT_MATCHING_THIS_NOTICE",
+              "tools": [
+                "get_recall_scope",
+                "get_delivery_record",
+                "get_case_evidence",
+                "evaluate_match",
+                "finish_investigation",
+                "finish_investigation"
+              ],
+              "elapsedMs": 16204,
+              "costUsd": 0.077864,
+              "tokens": {
+                "input": 13976,
+                "output": 1098,
+                "cacheRead": 0,
+                "cacheWrite": 0
+              },
+              "model": "claude-opus-5-5",
+              "summary": "The recorded delivery's GTIN 4056489470458 is listed in notice 2026-04-0331 for lots K100 (best before 2026-12-10) and K101 (best before 2026-12-11) only. A person confirmed the lot as K102 and the best-before date as 12/12/2026 from the label photo. The matcher returned NOT_MATCHING_THIS_NOTICE (GTIN_IN_NOTICE, LOT_NOT_LISTED). This only means this notice's batch criteria are not met, and the delivery record does not prove the product is still in stock. [refs: notice:2026-04-0331, notice:2026-04-0331#entry1, notice:2026-04-0331#entry2, delivery:EVAL-DL-009, document:6c7cca75-1e59-4f4b-9376-c547275a09d2, evidence:67bedde0-66dc-4397-a838-c2e716c6186f, evidence:d273466a-9b52-4ff2-aa99-954228bdebb7] [next: none]"
+            }
+          ],
+          "extraction": {
+            "status": "COMPLETED",
+            "model": "claude-opus-5-5",
+            "fields": {
+              "gtin_digits": "4056489470458",
+              "lot_text": "K102",
+              "best_before_text": "12/12/2026",
+              "legible": true
+            },
+            "ambiguous": [
+              {
+                "field": "lot_text",
+                "detail": "The '0' in K102 could be read as the letter 'O'."
+              }
+            ],
+            "correct": {
+              "gtin": true,
+              "lot": true,
+              "lotCaseInsensitive": true,
+              "bestBefore": true
+            },
+            "tokens": {
+              "input": 2021,
+              "output": 167
+            },
+            "elapsedMs": 3001
+          },
+          "statusAfterUnconfirmedExtraction": "NEEDS_EVIDENCE",
+          "confirmation": {
+            "lot": "K102",
+            "bestBefore": "12/12/2026",
+            "error": null,
+            "method": [
+              "best_before:ai_extraction_confirmed_by_human",
+              "lot:ai_extraction_confirmed_by_human"
+            ]
+          },
+          "humanTouches": {
+            "kitchenUpload": 1,
+            "managerConfirmation": 1
+          },
+          "finalStatus": "NOT_MATCHING_THIS_NOTICE",
+          "finalReasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_NOT_LISTED"
+          ],
+          "wallClockMs": 42293,
+          "costUsd": 0.175456,
+          "errors": []
+        },
+        {
+          "id": "D11",
+          "ran": true,
+          "skippedReason": null,
+          "expectedRequestFields": [
+            "best_before"
+          ],
+          "requestedFields": [
+            "best_before"
+          ],
+          "requestedExactly": true,
+          "segments": [
+            {
+              "trigger": "manual",
+              "runStatus": "NEEDS_EVIDENCE",
+              "errorCategory": null,
+              "caseStatusAfter": "NEEDS_EVIDENCE",
+              "tools": [
+                "get_recall_scope",
+                "get_delivery_record",
+                "get_case_evidence",
+                "evaluate_match",
+                "request_evidence",
+                "finish_investigation"
+              ],
+              "elapsedMs": 13651,
+              "costUsd": 0.055344,
+              "tokens": {
+                "input": 10101,
+                "output": 747,
+                "cacheRead": 0,
+                "cacheWrite": 0
+              },
+              "model": "claude-opus-5-5",
+              "summary": "The recorded delivery (delivery:EVAL-DL-011) has GTIN 4056489470441 and lot K100, which match notice:2026-04-0331#entry4. Its best-before is 11/12/2026, but the notice lists 2026-12-10 for that entry, so the matcher returned DATE_CONFLICT and needs the best-before date. A label photo showing the best-before date has been requested. Note for staff: the automatic message sent to the kitchen wrongly says no lot code was recorded at delivery (the record shows K100), so a person should check that wording. [refs: notice:2026-04-0331, notice:2026-04-0331#entry4, delivery:EVAL-DL-011] [next: await_label_photo]"
+            },
+            {
+              "trigger": "evidence_uploaded",
+              "runStatus": "NEEDS_EVIDENCE",
+              "errorCategory": null,
+              "caseStatusAfter": "NEEDS_EVIDENCE",
+              "tools": [
+                "get_recall_scope",
+                "get_delivery_record",
+                "get_case_evidence",
+                "extract_label",
+                "evaluate_match",
+                "finish_investigation"
+              ],
+              "elapsedMs": 15326,
+              "costUsd": 0.061576,
+              "tokens": {
+                "input": 10399,
+                "output": 999,
+                "cacheRead": 0,
+                "cacheWrite": 0
+              },
+              "model": "claude-opus-5-5",
+              "summary": "The delivery record (delivery:EVAL-DL-011) shows GTIN 4056489470441 and lot K100, which are both listed in notice:2026-04-0331#entry4. But its best-before date (11/12/2026) does not match the notice's 2026-12-10, so the matcher still returns NEEDS_EVIDENCE with DATE_CONFLICT and needs a best-before date. The uploaded photo (document:4044da19-660f-4c6a-8ac6-c30f82538b1c) has been transcribed (extraction:3111a62c-95ce-4bc3-a80a-c16f2685d6ee, UNCONFIRMED). It reads best-before 11/12/2026, and the lot code could be read as K100, K1OO or KI00. A person must check these values against the photo before the matcher can use them. Staff should also check the earlier kitchen message that wrongly said no lot code was recorded. [refs: notice:2026-04-0331, notice:2026-04-0331#entry4, delivery:EVAL-DL-011, document:4044da19-660f-4c6a-8ac6-c30f82538b1c, extraction:3111a62c-95ce-4bc3-a80a-c16f2685d6ee] [next: await_human_confirmation]"
+            },
+            {
+              "trigger": "evidence_confirmed",
+              "runStatus": "NEEDS_EVIDENCE",
+              "errorCategory": null,
+              "caseStatusAfter": "NEEDS_EVIDENCE",
+              "tools": [
+                "get_recall_scope",
+                "get_delivery_record",
+                "get_case_evidence",
+                "evaluate_match",
+                "finish_investigation"
+              ],
+              "elapsedMs": 16868,
+              "costUsd": 0.059844,
+              "tokens": {
+                "input": 9801,
+                "output": 1032,
+                "cacheRead": 0,
+                "cacheWrite": 0
+              },
+              "model": "claude-opus-5-5",
+              "summary": "The recorded delivery (delivery:EVAL-DL-011) has GTIN 4056489470441 and lot K100, which are listed together in notice:2026-04-0331#entry4. A manager confirmed the label values lot K100 (evidence:9d71ac00-1659-460a-aa80-3a16eacb1f9e) and best-before 11/12/2026 (evidence:fa545750-6c9b-4f5c-9567-df3056004ea7), taken from document:4044da19-660f-4c6a-8ac6-c30f82538b1c. Entry4 lists 2026-12-10, so the matcher still returns NEEDS_EVIDENCE with DATE_CONFLICT and best_before missing. The label evidence has been confirmed but the date conflict remains, so a manager needs to review this case (including the best_before evidence request that is still open). The delivery record does not prove the product is still in stock. [refs: notice:2026-04-0331, notice:2026-04-0331#entry4, delivery:EVAL-DL-011, document:4044da19-660f-4c6a-8ac6-c30f82538b1c, evidence:9d71ac00-1659-460a-aa80-3a16eacb1f9e, evidence:fa545750-6c9b-4f5c-9567-df3056004ea7] [next: manager_review]"
+            }
+          ],
+          "extraction": {
+            "status": "COMPLETED",
+            "model": "claude-opus-5-5",
+            "fields": {
+              "gtin_digits": "4056489470441",
+              "lot_text": "K100",
+              "best_before_text": "11/12/2026",
+              "legible": true
+            },
+            "ambiguous": [
+              {
+                "field": "lot_text",
+                "detail": "The characters after 'K1' could be read as zeros '00' or letter O's 'OO'."
+              },
+              {
+                "field": "lot_text",
+                "detail": "The '1' in 'K100' could be read as the letter 'I'."
+              }
+            ],
+            "correct": {
+              "gtin": true,
+              "lot": true,
+              "lotCaseInsensitive": true,
+              "bestBefore": true
+            },
+            "tokens": {
+              "input": 2021,
+              "output": 229
+            },
+            "elapsedMs": 3034
+          },
+          "statusAfterUnconfirmedExtraction": "NEEDS_EVIDENCE",
+          "confirmation": {
+            "lot": "K100",
+            "bestBefore": "11/12/2026",
+            "error": null,
+            "method": [
+              "best_before:ai_extraction_confirmed_by_human",
+              "lot:ai_extraction_confirmed_by_human"
+            ]
+          },
+          "humanTouches": {
+            "kitchenUpload": 1,
+            "managerConfirmation": 1
+          },
+          "finalStatus": "NEEDS_EVIDENCE",
+          "finalReasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_LISTED",
+            "DATE_CONFLICT"
+          ],
+          "wallClockMs": 50537,
+          "costUsd": 0.176764,
+          "errors": []
+        },
+        {
+          "id": "H09",
+          "ran": true,
+          "skippedReason": null,
+          "expectedRequestFields": [
+            "gtin"
+          ],
+          "requestedFields": [
+            "gtin"
+          ],
+          "requestedExactly": true,
+          "segments": [
+            {
+              "trigger": "manual",
+              "runStatus": "NEEDS_EVIDENCE",
+              "errorCategory": null,
+              "caseStatusAfter": "NEEDS_EVIDENCE",
+              "tools": [
+                "get_recall_scope",
+                "get_delivery_record",
+                "get_case_evidence",
+                "evaluate_match",
+                "request_evidence",
+                "finish_investigation"
+              ],
+              "elapsedMs": 13844,
+              "costUsd": 0.053492,
+              "tokens": {
+                "input": 9973,
+                "output": 680,
+                "cacheRead": 0,
+                "cacheWrite": 0
+              },
+              "model": "claude-opus-5-5",
+              "summary": "The recorded delivery (delivery:EVAL-DL-109) lists lot K100 with best-before 10/12/2026. That lot and date appear in notice entries notice:2026-04-0331#entry1 and #entry4, but the delivery record has no GTIN. The deterministic matcher returned NEEDS_EVIDENCE (GTIN_MISSING), so a match can't be confirmed or ruled out yet. A label photo showing the GTIN has been requested from the kitchen; the delivery record does not prove the product is still in stock. [refs: notice:2026-04-0331, notice:2026-04-0331#entry1, notice:2026-04-0331#entry4, delivery:EVAL-DL-109] [next: await_label_photo]"
+            },
+            {
+              "trigger": "evidence_uploaded",
+              "runStatus": "NEEDS_EVIDENCE",
+              "errorCategory": null,
+              "caseStatusAfter": "NEEDS_EVIDENCE",
+              "tools": [
+                "get_recall_scope",
+                "get_delivery_record",
+                "get_case_evidence",
+                "extract_label",
+                "evaluate_match",
+                "finish_investigation"
+              ],
+              "elapsedMs": 14090,
+              "costUsd": 0.059732,
+              "tokens": {
+                "input": 10333,
+                "output": 920,
+                "cacheRead": 0,
+                "cacheWrite": 0
+              },
+              "model": "claude-opus-5-5",
+              "summary": "The recorded delivery (delivery:EVAL-DL-109) shows lot K100, best-before 10/12/2026. That lot and date appear in notice:2026-04-0331#entry1 and #entry4, but the delivery has no GTIN, so the matcher returned NEEDS_EVIDENCE (GTIN_MISSING). The uploaded photo (document:3c059bd3-7f9a-4297-bda7-4a15fe7ebffa) was transcribed as extraction:ccab640d-8a8c-4879-83b3-fb3fa4d87225. It is UNCONFIRMED: it reads GTIN 4056489470458 and lot K100, but whether 'K100' contains zeros or letter O is unclear. A person must check the GTIN, lot (0 vs O) and best-before against the photo before the matcher can use them. The delivery record does not prove the product is still in stock. [refs: notice:2026-04-0331, notice:2026-04-0331#entry1, notice:2026-04-0331#entry4, delivery:EVAL-DL-109, document:3c059bd3-7f9a-4297-bda7-4a15fe7ebffa, extraction:ccab640d-8a8c-4879-83b3-fb3fa4d87225] [next: await_human_confirmation]"
+            },
+            {
+              "trigger": "evidence_confirmed",
+              "runStatus": "NEEDS_EVIDENCE",
+              "errorCategory": null,
+              "caseStatusAfter": "NEEDS_EVIDENCE",
+              "tools": [
+                "get_recall_scope",
+                "get_delivery_record",
+                "get_case_evidence",
+                "evaluate_match",
+                "finish_investigation"
+              ],
+              "elapsedMs": 13933,
+              "costUsd": 0.056636,
+              "tokens": {
+                "input": 9729,
+                "output": 886,
+                "cacheRead": 0,
+                "cacheWrite": 0
+              },
+              "model": "claude-opus-5-5",
+              "summary": "A person has now confirmed lot K100 (evidence:172d90b2-75cd-4c68-b478-02c53a320b14) and best-before 10/12/2026 (evidence:22b54ec7-d206-49bd-9adf-cb5f5da47712). Both agree with delivery:EVAL-DL-109, and that lot and date appear in notice:2026-04-0331#entry1 and #entry4. The GTIN is still not confirmed: the delivery has none, and the GTIN 4056489470458 read from document:3c059bd3-7f9a-4297-bda7-4a15fe7ebffa (extraction:ccab640d-8a8c-4879-83b3-fb3fa4d87225) is unconfirmed. So the matcher returned NEEDS_EVIDENCE (GTIN_MISSING). A person needs to check the GTIN against the photo (a GTIN request is already open); the delivery record does not prove the product is still in stock. [refs: notice:2026-04-0331, notice:2026-04-0331#entry1, notice:2026-04-0331#entry4, delivery:EVAL-DL-109, evidence:172d90b2-75cd-4c68-b478-02c53a320b14, evidence:22b54ec7-d206-49bd-9adf-cb5f5da47712, document:3c059bd3-7f9a-4297-bda7-4a15fe7ebffa, extraction:ccab640d-8a8c-4879-83b3-fb3fa4d87225] [next: await_human_confirmation]"
+            }
+          ],
+          "extraction": {
+            "status": "COMPLETED",
+            "model": "claude-opus-5-5",
+            "fields": {
+              "gtin_digits": "4056489470458",
+              "lot_text": "K100",
+              "best_before_text": "10/12/2026",
+              "legible": true
+            },
+            "ambiguous": [
+              {
+                "field": "lot_text",
+                "detail": "The two characters after '1' in 'K100' could be read as digit zero (0) or letter O."
+              }
+            ],
+            "correct": {
+              "gtin": true,
+              "lot": true,
+              "lotCaseInsensitive": true,
+              "bestBefore": true
+            },
+            "tokens": {
+              "input": 2021,
+              "output": 173
+            },
+            "elapsedMs": 3365
+          },
+          "statusAfterUnconfirmedExtraction": "NEEDS_EVIDENCE",
+          "confirmation": {
+            "lot": "K100",
+            "bestBefore": "10/12/2026",
+            "error": null,
+            "method": [
+              "best_before:ai_extraction_confirmed_by_human",
+              "lot:ai_extraction_confirmed_by_human"
+            ]
+          },
+          "humanTouches": {
+            "kitchenUpload": 1,
+            "managerConfirmation": 1
+          },
+          "finalStatus": "NEEDS_EVIDENCE",
+          "finalReasons": [
+            "GTIN_MISSING"
+          ],
+          "wallClockMs": 46341,
+          "costUsd": 0.16985999999999998,
+          "errors": []
+        },
+        {
+          "id": "H10",
+          "ran": true,
+          "skippedReason": null,
+          "expectedRequestFields": [
+            "gtin"
+          ],
+          "requestedFields": [
+            "gtin"
+          ],
+          "requestedExactly": true,
+          "segments": [
+            {
+              "trigger": "manual",
+              "runStatus": "NEEDS_EVIDENCE",
+              "errorCategory": null,
+              "caseStatusAfter": "NEEDS_EVIDENCE",
+              "tools": [
+                "get_recall_scope",
+                "get_delivery_record",
+                "get_case_evidence",
+                "evaluate_match",
+                "request_evidence",
+                "finish_investigation"
+              ],
+              "elapsedMs": 13966,
+              "costUsd": 0.055984,
+              "tokens": {
+                "input": 9971,
+                "output": 805,
+                "cacheRead": 0,
+                "cacheWrite": 0
+              },
+              "model": "claude-opus-5-5",
+              "summary": "Recorded delivery delivery:EVAL-DL-110 (Les Vergers Gourmands compote bio, 24 gourdes, received 2026-04-25) has no GTIN, lot or best-before recorded, so it cannot yet be compared against notice:2026-04-0331 entries #entry1–#entry4. The deterministic matcher returned NEEDS_EVIDENCE (GTIN_MISSING). A label photo showing the GTIN has been requested from the kitchen; the delivery record does not prove the product is still in stock. [refs: notice:2026-04-0331, notice:2026-04-0331#entry1, notice:2026-04-0331#entry2, notice:2026-04-0331#entry3, notice:2026-04-0331#entry4, delivery:EVAL-DL-110] [next: await_label_photo]"
+            },
+            {
+              "trigger": "evidence_uploaded",
+              "runStatus": "NEEDS_EVIDENCE",
+              "errorCategory": null,
+              "caseStatusAfter": "NEEDS_EVIDENCE",
+              "tools": [
+                "get_recall_scope",
+                "get_delivery_record",
+                "get_case_evidence",
+                "extract_label",
+                "evaluate_match",
+                "finish_investigation"
+              ],
+              "elapsedMs": 16340,
+              "costUsd": 0.062676,
+              "tokens": {
+                "input": 10374,
+                "output": 1059,
+                "cacheRead": 0,
+                "cacheWrite": 0
+              },
+              "model": "claude-opus-5-5",
+              "summary": "A label photo was uploaded for delivery:EVAL-DL-110 (document:2e89d27a-7f63-45d3-a9fa-c08edc2b5869) and transcribed in extraction:fd1aa918-6208-4e8e-987a-f0c8744c8973. The raw readings are GTIN 4056489470441, lot K101 and best before 11/12/2026. These values are UNCONFIRMED, and the extraction flags that the lot characters could be misread (1/I, 0/O). The deterministic matcher still returns NEEDS_EVIDENCE (GTIN_MISSING) because no human-confirmed values exist yet. A person must check the extracted GTIN, lot and best-before against the photo before the case can be compared with notice:2026-04-0331 entries #entry1–#entry4; the delivery record does not prove current stock. [refs: notice:2026-04-0331, notice:2026-04-0331#entry1, notice:2026-04-0331#entry2, notice:2026-04-0331#entry3, notice:2026-04-0331#entry4, delivery:EVAL-DL-110, document:2e89d27a-7f63-45d3-a9fa-c08edc2b5869, extraction:fd1aa918-6208-4e8e-987a-f0c8744c8973] [next: await_human_confirmation]"
+            },
+            {
+              "trigger": "evidence_confirmed",
+              "runStatus": "NEEDS_EVIDENCE",
+              "errorCategory": null,
+              "caseStatusAfter": "NEEDS_EVIDENCE",
+              "tools": [
+                "get_recall_scope",
+                "get_delivery_record",
+                "get_case_evidence",
+                "evaluate_match",
+                "finish_investigation"
+              ],
+              "elapsedMs": 14602,
+              "costUsd": 0.059228,
+              "tokens": {
+                "input": 9907,
+                "output": 980,
+                "cacheRead": 0,
+                "cacheWrite": 0
+              },
+              "model": "claude-opus-5-5",
+              "summary": "Human-confirmed evidence for delivery:EVAL-DL-110 gives lot K101 (evidence:91a57dfd-d80c-4dee-87b6-5d24603510e5) and best before 11/12/2026 (evidence:5beadb83-91b3-49fb-9ede-8edcbb80b297), but no GTIN has been confirmed, so the deterministic matcher returns NEEDS_EVIDENCE (GTIN_MISSING). The GTIN decides the outcome: lot K101 / best before 2026-12-11 appears only under GTIN 4056489470458 (notice:2026-04-0331#entry2), and none of the GTIN 4056489470441 entries (#entry3, #entry4) list it. The photo document:2e89d27a-7f63-45d3-a9fa-c08edc2b5869 has an UNCONFIRMED GTIN reading in extraction:fd1aa918-6208-4e8e-987a-f0c8744c8973 that a person must check against the photo and confirm; a GTIN request is already open. The delivery record does not prove current stock. [refs: delivery:EVAL-DL-110, evidence:91a57dfd-d80c-4dee-87b6-5d24603510e5, evidence:5beadb83-91b3-49fb-9ede-8edcbb80b297, notice:2026-04-0331, notice:2026-04-0331#entry2, notice:2026-04-0331#entry3, notice:2026-04-0331#entry4, document:2e89d27a-7f63-45d3-a9fa-c08edc2b5869, extraction:fd1aa918-6208-4e8e-987a-f0c8744c8973] [next: await_human_confirmation]"
+            }
+          ],
+          "extraction": {
+            "status": "COMPLETED",
+            "model": "claude-opus-5-5",
+            "fields": {
+              "gtin_digits": "4056489470441",
+              "lot_text": "K101",
+              "best_before_text": "11/12/2026",
+              "legible": true
+            },
+            "ambiguous": [
+              {
+                "field": "lot_text",
+                "detail": "Characters '1' and '0' in K101 could possibly be read as 'I' and 'O' in this bold sans-serif font."
+              }
+            ],
+            "correct": {
+              "gtin": true,
+              "lot": true,
+              "lotCaseInsensitive": true,
+              "bestBefore": true
+            },
+            "tokens": {
+              "input": 2021,
+              "output": 190
+            },
+            "elapsedMs": 3535
+          },
+          "statusAfterUnconfirmedExtraction": "NEEDS_EVIDENCE",
+          "confirmation": {
+            "lot": "K101",
+            "bestBefore": "11/12/2026",
+            "error": null,
+            "method": [
+              "best_before:ai_extraction_confirmed_by_human",
+              "lot:ai_extraction_confirmed_by_human"
+            ]
+          },
+          "humanTouches": {
+            "kitchenUpload": 1,
+            "managerConfirmation": 1
+          },
+          "finalStatus": "NEEDS_EVIDENCE",
+          "finalReasons": [
+            "GTIN_MISSING"
+          ],
+          "wallClockMs": 49063,
+          "costUsd": 0.177888,
+          "errors": []
+        },
+        {
+          "id": "H11",
+          "ran": true,
+          "skippedReason": null,
+          "expectedRequestFields": [
+            "lot",
+            "best_before"
+          ],
+          "requestedFields": [
+            "lot",
+            "best_before"
+          ],
+          "requestedExactly": true,
+          "segments": [
+            {
+              "trigger": "manual",
+              "runStatus": "NEEDS_EVIDENCE",
+              "errorCategory": null,
+              "caseStatusAfter": "NEEDS_EVIDENCE",
+              "tools": [
+                "get_recall_scope",
+                "get_delivery_record",
+                "get_case_evidence",
+                "evaluate_match",
+                "request_evidence",
+                "finish_investigation"
+              ],
+              "elapsedMs": 11681,
+              "costUsd": 0.052452,
+              "tokens": {
+                "input": 9943,
+                "output": 634,
+                "cacheRead": 0,
+                "cacheWrite": 0
+              },
+              "model": "claude-opus-5-5",
+              "summary": "The recorded delivery (delivery:EVAL-DL-111) is GTIN 4056489470441, which this notice lists for lot K099 (best before 2026-12-09) and lot K100 (best before 2026-12-10) (notice:2026-04-0331#entry3, notice:2026-04-0331#entry4). The register has no lot or best-before date, so the matcher returned NEEDS_EVIDENCE with lot and best_before missing. A label photo showing both fields has been requested from the kitchen. The delivery record does not prove the product is still in stock. [refs: notice:2026-04-0331, notice:2026-04-0331#entry3, notice:2026-04-0331#entry4, delivery:EVAL-DL-111] [next: await_label_photo]"
+            },
+            {
+              "trigger": "evidence_uploaded",
+              "runStatus": "NEEDS_EVIDENCE",
+              "errorCategory": null,
+              "caseStatusAfter": "NEEDS_EVIDENCE",
+              "tools": [
+                "get_recall_scope",
+                "get_delivery_record",
+                "get_case_evidence",
+                "extract_label",
+                "evaluate_match",
+                "finish_investigation"
+              ],
+              "elapsedMs": 15150,
+              "costUsd": 0.060612,
+              "tokens": {
+                "input": 10383,
+                "output": 954,
+                "cacheRead": 0,
+                "cacheWrite": 0
+              },
+              "model": "claude-opus-5-5",
+              "summary": "The recorded delivery (delivery:EVAL-DL-111) has GTIN 4056489470441. This notice lists that GTIN for lot K099 (best before 2026-12-09) and lot K100 (best before 2026-12-10) (notice:2026-04-0331#entry3, #entry4). The uploaded label photo (document:a7afd538-c2ad-414c-9b06-d5cf5facec8a) was transcribed but is UNCONFIRMED (extraction:2889c64a-8a0c-4a62-8717-8476a25e028b): it reads lot \"K100\" and best before 10/12/2026. The characters after \"K\" could be digits 1-0-0 or the letters I-O-O, so a person must check this against the photo. Until a person confirms the lot and best-before date, the matcher result stays NEEDS_EVIDENCE. The delivery record does not prove the product is still in stock. [refs: notice:2026-04-0331, notice:2026-04-0331#entry3, notice:2026-04-0331#entry4, delivery:EVAL-DL-111, document:a7afd538-c2ad-414c-9b06-d5cf5facec8a, extraction:2889c64a-8a0c-4a62-8717-8476a25e028b] [next: await_human_confirmation]"
+            },
+            {
+              "trigger": "evidence_confirmed",
+              "runStatus": "COMPLETED",
+              "errorCategory": null,
+              "caseStatusAfter": "RECORDED_MATCH",
+              "tools": [
+                "get_recall_scope",
+                "get_delivery_record",
+                "get_case_evidence",
+                "evaluate_match",
+                "finish_investigation"
+              ],
+              "elapsedMs": 12475,
+              "costUsd": 0.051384,
+              "tokens": {
+                "input": 9866,
+                "output": 596,
+                "cacheRead": 0,
+                "cacheWrite": 0
+              },
+              "model": "claude-opus-5-5",
+              "summary": "The recorded delivery (delivery:EVAL-DL-111) has GTIN 4056489470441. A person confirmed lot K100 (evidence:bf173827-e0cc-46d5-abbb-66271996ec91) and best before 10/12/2026 (evidence:4a51da7f-b689-4fbb-8652-5ebb57c09f71). The matcher found these match notice entry notice:2026-04-0331#entry4 exactly (GTIN, lot K100, best before 2026-12-10). The delivery record does not prove the product is still in stock, and a staff report on its own would not be independent proof that it was removed. A manager should review next steps. [refs: notice:2026-04-0331, notice:2026-04-0331#entry4, delivery:EVAL-DL-111, evidence:bf173827-e0cc-46d5-abbb-66271996ec91, evidence:4a51da7f-b689-4fbb-8652-5ebb57c09f71, document:a7afd538-c2ad-414c-9b06-d5cf5facec8a] [next: manager_review]"
+            }
+          ],
+          "extraction": {
+            "status": "COMPLETED",
+            "model": "claude-opus-5-5",
+            "fields": {
+              "gtin_digits": "4056489470441",
+              "lot_text": "K100",
+              "best_before_text": "10/12/2026",
+              "legible": true
+            },
+            "ambiguous": [
+              {
+                "field": "lot_text",
+                "detail": "The characters after K in 'K100' could be read as digits 1-0-0 or as letters I-O-O; transcribed as printed digits 100."
+              }
+            ],
+            "correct": {
+              "gtin": true,
+              "lot": true,
+              "lotCaseInsensitive": true,
+              "bestBefore": true
+            },
+            "tokens": {
+              "input": 2021,
+              "output": 207
+            },
+            "elapsedMs": 3294
+          },
+          "statusAfterUnconfirmedExtraction": "NEEDS_EVIDENCE",
+          "confirmation": {
+            "lot": "K100",
+            "bestBefore": "10/12/2026",
+            "error": null,
+            "method": [
+              "best_before:ai_extraction_confirmed_by_human",
+              "lot:ai_extraction_confirmed_by_human"
+            ]
+          },
+          "humanTouches": {
+            "kitchenUpload": 1,
+            "managerConfirmation": 1
+          },
+          "finalStatus": "RECORDED_MATCH",
+          "finalReasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_LISTED",
+            "DATE_CONFIRMED"
+          ],
+          "wallClockMs": 44406,
+          "costUsd": 0.16444799999999998,
+          "errors": []
+        },
+        {
+          "id": "H12",
+          "ran": true,
+          "skippedReason": null,
+          "expectedRequestFields": [
+            "lot",
+            "best_before"
+          ],
+          "requestedFields": [
+            "lot",
+            "best_before"
+          ],
+          "requestedExactly": true,
+          "segments": [
+            {
+              "trigger": "manual",
+              "runStatus": "NEEDS_EVIDENCE",
+              "errorCategory": null,
+              "caseStatusAfter": "NEEDS_EVIDENCE",
+              "tools": [
+                "get_recall_scope",
+                "get_delivery_record",
+                "get_case_evidence",
+                "evaluate_match",
+                "request_evidence",
+                "finish_investigation"
+              ],
+              "elapsedMs": 13317,
+              "costUsd": 0.052684,
+              "tokens": {
+                "input": 9971,
+                "output": 640,
+                "cacheRead": 0,
+                "cacheWrite": 0
+              },
+              "model": "claude-opus-5-5",
+              "summary": "The recorded delivery (24 pouches, GTIN 4056489470458, received 2026-04-26) has a GTIN listed in the notice, under entries 1 and 2 (lot K100 with best-before 2026-12-10, and lot K101 with best-before 2026-12-11). The delivery record has no lot or best-before date, so the matcher returned NEEDS_EVIDENCE. A label photo showing the lot and best-before date has been requested from the kitchen. The delivery record does not prove the product is still in stock. [refs: notice:2026-04-0331#entry1, notice:2026-04-0331#entry2, delivery:EVAL-DL-112] [next: await_label_photo]"
+            },
+            {
+              "trigger": "evidence_uploaded",
+              "runStatus": "NEEDS_EVIDENCE",
+              "errorCategory": null,
+              "caseStatusAfter": "NEEDS_EVIDENCE",
+              "tools": [
+                "get_recall_scope",
+                "get_delivery_record",
+                "get_case_evidence",
+                "extract_label",
+                "evaluate_match",
+                "finish_investigation"
+              ],
+              "elapsedMs": 13222,
+              "costUsd": 0.056844,
+              "tokens": {
+                "input": 10291,
+                "output": 784,
+                "cacheRead": 0,
+                "cacheWrite": 0
+              },
+              "model": "claude-opus-5-5",
+              "summary": "The recorded delivery's GTIN 4056489470458 appears in the notice (entries 1–2: K100/2026-12-10, K101/2026-12-11), but the register has no lot or best-before date, so the matcher returns NEEDS_EVIDENCE. The uploaded label photo was extracted with UNCONFIRMED values: lot \"K103\" (the '0' could be the letter 'O') and best-before 13/12/2026. A person must check these against the photo before the evaluator can use them. The delivery record does not prove the product is still in stock. [refs: notice:2026-04-0331#entry1, notice:2026-04-0331#entry2, delivery:EVAL-DL-112, document:129cd4ff-1c86-4865-916d-8231d01dc2fa, extraction:9b7eb4f0-10e6-476d-97ec-f4ca2137f056] [next: await_human_confirmation]"
+            },
+            {
+              "trigger": "evidence_confirmed",
+              "runStatus": "COMPLETED",
+              "errorCategory": null,
+              "caseStatusAfter": "NOT_MATCHING_THIS_NOTICE",
+              "tools": [
+                "get_recall_scope",
+                "get_delivery_record",
+                "get_case_evidence",
+                "evaluate_match",
+                "finish_investigation"
+              ],
+              "elapsedMs": 11374,
+              "costUsd": 0.049132,
+              "tokens": {
+                "input": 9428,
+                "output": 571,
+                "cacheRead": 0,
+                "cacheWrite": 0
+              },
+              "model": "claude-opus-5-5",
+              "summary": "The recorded delivery's GTIN 4056489470458 is listed in the notice, but only for lots K100 (best-before 2026-12-10) and K101 (best-before 2026-12-11). A person has confirmed lot K103 and best-before 13/12/2026, and the matcher returned NOT_MATCHING_THIS_NOTICE (LOT_NOT_LISTED). This means only that this notice's criteria are not met. It says nothing about the product beyond that, and the delivery record does not prove the product is still in stock. [refs: notice:2026-04-0331#entry1, notice:2026-04-0331#entry2, delivery:EVAL-DL-112, evidence:33582b59-8ec7-473e-94e2-da7590c4012d, evidence:1ff22f42-3c6b-47f6-ace5-9c6c9c4f75dd, document:129cd4ff-1c86-4865-916d-8231d01dc2fa] [next: none]"
+            }
+          ],
+          "extraction": {
+            "status": "COMPLETED",
+            "model": "claude-opus-5-5",
+            "fields": {
+              "gtin_digits": "4056489470458",
+              "lot_text": "K103",
+              "best_before_text": "13/12/2026",
+              "legible": true
+            },
+            "ambiguous": [
+              {
+                "field": "lot_text",
+                "detail": "The '0' in K103 could be read as the letter 'O'."
+              }
+            ],
+            "correct": {
+              "gtin": true,
+              "lot": true,
+              "lotCaseInsensitive": true,
+              "bestBefore": true
+            },
+            "tokens": {
+              "input": 2021,
+              "output": 167
+            },
+            "elapsedMs": 2491
+          },
+          "statusAfterUnconfirmedExtraction": "NEEDS_EVIDENCE",
+          "confirmation": {
+            "lot": "K103",
+            "bestBefore": "13/12/2026",
+            "error": null,
+            "method": [
+              "best_before:ai_extraction_confirmed_by_human",
+              "lot:ai_extraction_confirmed_by_human"
+            ]
+          },
+          "humanTouches": {
+            "kitchenUpload": 1,
+            "managerConfirmation": 1
+          },
+          "finalStatus": "NOT_MATCHING_THIS_NOTICE",
+          "finalReasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_NOT_LISTED"
+          ],
+          "wallClockMs": 42209,
+          "costUsd": 0.15866,
+          "errors": []
+        },
+        {
+          "id": "H14",
+          "ran": true,
+          "skippedReason": null,
+          "expectedRequestFields": [
+            "lot",
+            "best_before"
+          ],
+          "requestedFields": [
+            "lot",
+            "best_before"
+          ],
+          "requestedExactly": true,
+          "segments": [
+            {
+              "trigger": "manual",
+              "runStatus": "NEEDS_EVIDENCE",
+              "errorCategory": null,
+              "caseStatusAfter": "NEEDS_EVIDENCE",
+              "tools": [
+                "get_recall_scope",
+                "get_delivery_record",
+                "get_case_evidence",
+                "evaluate_match",
+                "request_evidence",
+                "finish_investigation"
+              ],
+              "elapsedMs": 18535,
+              "costUsd": 0.05308,
+              "tokens": {
+                "input": 9940,
+                "output": 666,
+                "cacheRead": 0,
+                "cacheWrite": 0
+              },
+              "model": "claude-opus-5-5",
+              "summary": "The recorded delivery (delivery:EVAL-DL-114, 24 gourdes received 2026-04-27) has GTIN 4056489470458. That GTIN is listed in notice:2026-04-0331 (entries #entry1 lot K100 BB 2026-12-10 and #entry2 lot K101 BB 2026-12-11), but the register has no lot or best-before date. The deterministic matcher returned NEEDS_EVIDENCE (GTIN_IN_NOTICE, LOT_MISSING). A label photo showing the lot and best-before date has been requested from the kitchen. The delivery record does not prove the product is still in stock. [refs: notice:2026-04-0331, notice:2026-04-0331#entry1, notice:2026-04-0331#entry2, delivery:EVAL-DL-114] [next: await_label_photo]"
+            },
+            {
+              "trigger": "evidence_uploaded",
+              "runStatus": "NEEDS_EVIDENCE",
+              "errorCategory": null,
+              "caseStatusAfter": "NEEDS_EVIDENCE",
+              "tools": [
+                "get_recall_scope",
+                "get_delivery_record",
+                "get_case_evidence",
+                "extract_label",
+                "evaluate_match",
+                "finish_investigation",
+                "finish_investigation"
+              ],
+              "elapsedMs": 23475,
+              "costUsd": 0.092232,
+              "tokens": {
+                "input": 14868,
+                "output": 1638,
+                "cacheRead": 0,
+                "cacheWrite": 0
+              },
+              "model": "claude-opus-5-5",
+              "summary": "Delivery delivery:EVAL-DL-114 has GTIN 4056489470458, listed in notice:2026-04-0331 (#entry1 K100 BB 2026-12-10; #entry2 K101 BB 2026-12-11). The matcher returns NEEDS_EVIDENCE (LOT_MISSING): no lot or best-before date has been confirmed yet. Photo document:fb6fa44e-1045-4b47-86f2-de11fd3bc30c was transcribed (unconfirmed, extraction:df2296ed-aa91-4a73-96fa-760ee42833c6) as lot \"K1OO\", BB 10/12/2026. The O/0 and 1/I characters are ambiguous, so a person must confirm the exact lot and date. The delivery record does not prove current stock. [refs: notice:2026-04-0331, notice:2026-04-0331#entry1, notice:2026-04-0331#entry2, delivery:EVAL-DL-114, document:fb6fa44e-1045-4b47-86f2-de11fd3bc30c, extraction:df2296ed-aa91-4a73-96fa-760ee42833c6] [next: await_human_confirmation]"
+            },
+            {
+              "trigger": "evidence_confirmed",
+              "runStatus": "COMPLETED",
+              "errorCategory": null,
+              "caseStatusAfter": "NOT_MATCHING_THIS_NOTICE",
+              "tools": [
+                "get_recall_scope",
+                "get_delivery_record",
+                "get_case_evidence",
+                "evaluate_match",
+                "finish_investigation",
+                "finish_investigation"
+              ],
+              "elapsedMs": 23563,
+              "costUsd": 0.094132,
+              "tokens": {
+                "input": 15003,
+                "output": 1706,
+                "cacheRead": 0,
+                "cacheWrite": 0
+              },
+              "model": "claude-opus-5-5",
+              "summary": "Matcher: NOT_MATCHING_THIS_NOTICE (GTIN_IN_NOTICE, LOT_NOT_LISTED). GTIN 4056489470458 (delivery:EVAL-DL-114) is listed, but confirmed lot \"K1OO\" uses letter O (evidence:e8a6945f-bc93-4da8-bf47-e418255bdc00), which does not equal K100/K101 under the notice rules. Manager review needed: confirmed best-before 10/12/2026 (evidence:ab2ea5c3-125c-4507-96b0-55376eb9bd67) equals the K100 date (notice:2026-04-0331#entry1), and O-vs-0 was flagged as ambiguous (extraction:df2296ed-aa91-4a73-96fa-760ee42833c6); recheck the label (document:fb6fa44e-1045-4b47-86f2-de11fd3bc30c). This only means this notice's exact criteria aren't met by confirmed values; delivery does not prove stock. [refs: notice:2026-04-0331, notice:2026-04-0331#entry1, delivery:EVAL-DL-114, evidence:e8a6945f-bc93-4da8-bf47-e418255bdc00, evidence:ab2ea5c3-125c-4507-96b0-55376eb9bd67, document:fb6fa44e-1045-4b47-86f2-de11fd3bc30c, extraction:df2296ed-aa91-4a73-96fa-760ee42833c6] [next: manager_review]"
+            }
+          ],
+          "extraction": {
+            "status": "COMPLETED",
+            "model": "claude-opus-5-5",
+            "fields": {
+              "gtin_digits": "4056489470458",
+              "lot_text": "K1OO",
+              "best_before_text": "10/12/2026",
+              "legible": true
+            },
+            "ambiguous": [
+              {
+                "field": "lot_text",
+                "detail": "The last two characters of 'K1OO' look like the letter O but could be the digit 0 (K100)."
+              },
+              {
+                "field": "lot_text",
+                "detail": "The second character looks like the digit 1 but could be the letter I or l."
+              }
+            ],
+            "correct": {
+              "gtin": true,
+              "lot": true,
+              "lotCaseInsensitive": true,
+              "bestBefore": true
+            },
+            "tokens": {
+              "input": 2021,
+              "output": 229
+            },
+            "elapsedMs": 5051
+          },
+          "statusAfterUnconfirmedExtraction": "NEEDS_EVIDENCE",
+          "confirmation": {
+            "lot": "K1OO",
+            "bestBefore": "10/12/2026",
+            "error": null,
+            "method": [
+              "best_before:ai_extraction_confirmed_by_human",
+              "lot:ai_extraction_confirmed_by_human"
+            ]
+          },
+          "humanTouches": {
+            "kitchenUpload": 1,
+            "managerConfirmation": 1
+          },
+          "finalStatus": "NOT_MATCHING_THIS_NOTICE",
+          "finalReasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_NOT_LISTED"
+          ],
+          "wallClockMs": 71363,
+          "costUsd": 0.239444,
+          "errors": []
+        },
+        {
+          "id": "H15",
+          "ran": true,
+          "skippedReason": null,
+          "expectedRequestFields": [
+            "best_before"
+          ],
+          "requestedFields": [
+            "best_before"
+          ],
+          "requestedExactly": true,
+          "segments": [
+            {
+              "trigger": "manual",
+              "runStatus": "NEEDS_EVIDENCE",
+              "errorCategory": null,
+              "caseStatusAfter": "NEEDS_EVIDENCE",
+              "tools": [
+                "get_recall_scope",
+                "get_delivery_record",
+                "get_case_evidence",
+                "evaluate_match",
+                "request_evidence",
+                "finish_investigation"
+              ],
+              "elapsedMs": 14970,
+              "costUsd": 0.057848,
+              "tokens": {
+                "input": 10182,
+                "output": 856,
+                "cacheRead": 0,
+                "cacheWrite": 0
+              },
+              "model": "claude-opus-5-5",
+              "summary": "Delivery delivery:EVAL-DL-115 records GTIN 4056489470458, lot K100, best-before 11/12/2026. Notice entry notice:2026-04-0331#entry1 lists K100 with best-before 2026-12-10, and notice:2026-04-0331#entry2 lists 2026-12-11 with lot K101, not K100. The deterministic matcher therefore returned NEEDS_EVIDENCE (GTIN_IN_NOTICE, LOT_LISTED, DATE_CONFLICT), with best_before missing. A label photo showing the best-before date has been requested. Note: the auto-generated kitchen message wrongly says no lot code was recorded; the register has lot K100. The delivery record does not prove current stock. [refs: delivery:EVAL-DL-115, notice:2026-04-0331, notice:2026-04-0331#entry1, notice:2026-04-0331#entry2] [next: await_label_photo]"
+            },
+            {
+              "trigger": "evidence_uploaded",
+              "runStatus": "NEEDS_EVIDENCE",
+              "errorCategory": null,
+              "caseStatusAfter": "NEEDS_EVIDENCE",
+              "tools": [
+                "get_recall_scope",
+                "get_delivery_record",
+                "get_case_evidence",
+                "extract_label",
+                "evaluate_match",
+                "finish_investigation",
+                "finish_investigation"
+              ],
+              "elapsedMs": 22078,
+              "costUsd": 0.091412,
+              "tokens": {
+                "input": 14943,
+                "output": 1582,
+                "cacheRead": 0,
+                "cacheWrite": 0
+              },
+              "model": "claude-opus-5-5",
+              "summary": "Matcher: NEEDS_EVIDENCE (DATE_CONFLICT; best_before missing). The register (delivery:EVAL-DL-115) has lot K100 and best-before 11/12/2026, but the notice pairs K100 with 2026-12-10 (entry1) and 2026-12-11 with K101 (entry2). The unconfirmed photo reading (extraction:329439f9-0eda-45d1-b8e7-2d69b0fb00f6) shows best-before 11/12/2026 but reads the lot as K101 (flagged ambiguous 1/I, 0/O), which differs from the register. A person must confirm the GTIN, lot and best-before on the photo, especially the lot. The delivery record doesn't prove current stock. [refs: delivery:EVAL-DL-115, notice:2026-04-0331#entry1, notice:2026-04-0331#entry2, document:467a5cde-3425-4b64-a492-6d3dbd22cf49, extraction:329439f9-0eda-45d1-b8e7-2d69b0fb00f6] [next: await_human_confirmation]"
+            },
+            {
+              "trigger": "evidence_confirmed",
+              "runStatus": "NEEDS_EVIDENCE",
+              "errorCategory": null,
+              "caseStatusAfter": "NEEDS_EVIDENCE",
+              "tools": [
+                "get_recall_scope",
+                "get_delivery_record",
+                "get_case_evidence",
+                "evaluate_match",
+                "request_evidence",
+                "finish_investigation",
+                "finish_investigation"
+              ],
+              "elapsedMs": 28387,
+              "costUsd": 0.117476,
+              "tokens": {
+                "input": 19769,
+                "output": 1920,
+                "cacheRead": 0,
+                "cacheWrite": 0
+              },
+              "model": "claude-opus-5-5",
+              "summary": "Matcher: NEEDS_EVIDENCE (GTIN_IN_NOTICE, LOT_CONFLICT; lot missing). Register lot is K100 (delivery:EVAL-DL-115) but the human-confirmed photo lot is K101 (evidence:b0e748af-630a-48c5-af98-65650226233f), which was flagged as possibly I0I/1O1 (extraction:329439f9-0eda-45d1-b8e7-2d69b0fb00f6). With best-before 11/12/2026 confirmed (evidence:81de8f06-932a-415f-bbc4-67bdaaa8afed), K101 fits notice:2026-04-0331#entry2 but K100 doesn't fit entry1. A lot request couldn't be opened because a stale best-before request is still open; a manager should close it and verify the lot. The delivery record doesn't prove current stock. [refs: delivery:EVAL-DL-115, evidence:b0e748af-630a-48c5-af98-65650226233f, evidence:81de8f06-932a-415f-bbc4-67bdaaa8afed, extraction:329439f9-0eda-45d1-b8e7-2d69b0fb00f6, document:467a5cde-3425-4b64-a492-6d3dbd22cf49, notice:2026-04-0331#entry1, notice:2026-04-0331#entry2] [next: manager_review]"
+            }
+          ],
+          "extraction": {
+            "status": "COMPLETED",
+            "model": "claude-opus-5-5",
+            "fields": {
+              "gtin_digits": "4056489470458",
+              "lot_text": "K101",
+              "best_before_text": "11/12/2026",
+              "legible": true
+            },
+            "ambiguous": [
+              {
+                "field": "lot_text",
+                "detail": "Characters after K could be read as '101' or 'I0I'/'1O1' (1 vs I, 0 vs O)."
+              }
+            ],
+            "correct": {
+              "gtin": true,
+              "lot": true,
+              "lotCaseInsensitive": true,
+              "bestBefore": true
+            },
+            "tokens": {
+              "input": 2021,
+              "output": 186
+            },
+            "elapsedMs": 4003
+          },
+          "statusAfterUnconfirmedExtraction": "NEEDS_EVIDENCE",
+          "confirmation": {
+            "lot": "K101",
+            "bestBefore": "11/12/2026",
+            "error": null,
+            "method": [
+              "best_before:ai_extraction_confirmed_by_human",
+              "lot:ai_extraction_confirmed_by_human"
+            ]
+          },
+          "humanTouches": {
+            "kitchenUpload": 1,
+            "managerConfirmation": 1
+          },
+          "finalStatus": "NEEDS_EVIDENCE",
+          "finalReasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_CONFLICT"
+          ],
+          "wallClockMs": 70675,
+          "costUsd": 0.266736,
+          "errors": []
+        },
+        {
+          "id": "H16",
+          "ran": true,
+          "skippedReason": null,
+          "expectedRequestFields": [
+            "best_before"
+          ],
+          "requestedFields": [
+            "best_before"
+          ],
+          "requestedExactly": true,
+          "segments": [
+            {
+              "trigger": "manual",
+              "runStatus": "NEEDS_EVIDENCE",
+              "errorCategory": null,
+              "caseStatusAfter": "NEEDS_EVIDENCE",
+              "tools": [
+                "get_recall_scope",
+                "get_delivery_record",
+                "get_case_evidence",
+                "evaluate_match",
+                "request_evidence",
+                "finish_investigation"
+              ],
+              "elapsedMs": 13444,
+              "costUsd": 0.056412,
+              "tokens": {
+                "input": 10133,
+                "output": 794,
+                "cacheRead": 0,
+                "cacheWrite": 0
+              },
+              "model": "claude-opus-5-5",
+              "summary": "The delivery register (delivery:EVAL-DL-116) records GTIN 4056489470458, lot K101, best-before 10/12/2026. The notice lists lot K101 only with best-before 2026-12-11 (notice:2026-04-0331#entry2), and lists 2026-12-10 only for lot K100 (notice:2026-04-0331#entry1). The matcher returned NEEDS_EVIDENCE (DATE_CONFLICT, missing best_before), so a label photo showing the best-before date has been requested. Note: the auto-generated kitchen message wrongly says no lot code was recorded, but the register does record lot K101. Delivery records do not prove current stock. [refs: delivery:EVAL-DL-116, notice:2026-04-0331#entry1, notice:2026-04-0331#entry2] [next: await_label_photo]"
+            },
+            {
+              "trigger": "evidence_uploaded",
+              "runStatus": "NEEDS_EVIDENCE",
+              "errorCategory": null,
+              "caseStatusAfter": "NEEDS_EVIDENCE",
+              "tools": [
+                "get_recall_scope",
+                "get_delivery_record",
+                "get_case_evidence",
+                "extract_label",
+                "evaluate_match",
+                "finish_investigation"
+              ],
+              "elapsedMs": 19684,
+              "costUsd": 0.060464,
+              "tokens": {
+                "input": 10441,
+                "output": 935,
+                "cacheRead": 0,
+                "cacheWrite": 0
+              },
+              "model": "claude-opus-5-5",
+              "summary": "The register (delivery:EVAL-DL-116) records GTIN 4056489470458, lot K101, best-before 10/12/2026, which conflicts with the notice's K101 entry (best-before 2026-12-11, notice:2026-04-0331#entry2); the matcher still returns NEEDS_EVIDENCE (DATE_CONFLICT, missing best_before). The uploaded label photo (document:9d32d6fc-3060-4cd6-81b7-74428ed0ed74) was transcribed (extraction:10fabe43-5e54-491b-917d-641fcafa3407) as GTIN 4056489470458, lot K101, best-before 11/12/2026, but these values are UNCONFIRMED and the lot reading has a noted ambiguity (1-0-1 vs I-O-I/l-O-l). A person must confirm the GTIN, lot and best-before against the photo before the matcher can use them; the delivery record does not prove current stock. [refs: delivery:EVAL-DL-116, notice:2026-04-0331#entry1, notice:2026-04-0331#entry2, document:9d32d6fc-3060-4cd6-81b7-74428ed0ed74, extraction:10fabe43-5e54-491b-917d-641fcafa3407] [next: await_human_confirmation]"
+            },
+            {
+              "trigger": "evidence_confirmed",
+              "runStatus": "NEEDS_EVIDENCE",
+              "errorCategory": null,
+              "caseStatusAfter": "NEEDS_EVIDENCE",
+              "tools": [
+                "get_recall_scope",
+                "get_delivery_record",
+                "get_case_evidence",
+                "evaluate_match",
+                "finish_investigation"
+              ],
+              "elapsedMs": 13860,
+              "costUsd": 0.0572,
+              "tokens": {
+                "input": 9825,
+                "output": 895,
+                "cacheRead": 0,
+                "cacheWrite": 0
+              },
+              "model": "claude-opus-5-5",
+              "summary": "The register records GTIN 4056489470458, lot K101, best-before 10/12/2026 (delivery:EVAL-DL-116). The notice lists K101 only with best-before 2026-12-11 (notice:2026-04-0331#entry2), and lists 2026-12-10 only for K100 (notice:2026-04-0331#entry1). A manager has now confirmed lot K101 and best-before 11/12/2026 from the label photo (evidence:117923a4-6bce-4515-a351-d7ea9ac45fb9, evidence:0204890d-1ed3-495d-8ae5-b7c28d979423, document:9d32d6fc-3060-4cd6-81b7-74428ed0ed74), and that confirmed date would fit entry2. However, the matcher still uses the register date and returns NEEDS_EVIDENCE (DATE_CONFLICT, best_before missing), so a manager needs to settle the register-versus-label date conflict. Separately, the delivery record does not prove the product is still in stock. [refs: delivery:EVAL-DL-116, notice:2026-04-0331#entry1, notice:2026-04-0331#entry2, evidence:117923a4-6bce-4515-a351-d7ea9ac45fb9, evidence:0204890d-1ed3-495d-8ae5-b7c28d979423, document:9d32d6fc-3060-4cd6-81b7-74428ed0ed74] [next: manager_review]"
+            }
+          ],
+          "extraction": {
+            "status": "COMPLETED",
+            "model": "claude-opus-5-5",
+            "fields": {
+              "gtin_digits": "4056489470458",
+              "lot_text": "K101",
+              "best_before_text": "11/12/2026",
+              "legible": true
+            },
+            "ambiguous": [
+              {
+                "field": "lot_text",
+                "detail": "Characters after K could be read as 1-0-1 or I-O-I/l-O-l."
+              }
+            ],
+            "correct": {
+              "gtin": true,
+              "lot": true,
+              "lotCaseInsensitive": true,
+              "bestBefore": true
+            },
+            "tokens": {
+              "input": 2021,
+              "output": 178
+            },
+            "elapsedMs": 3624
+          },
+          "statusAfterUnconfirmedExtraction": "NEEDS_EVIDENCE",
+          "confirmation": {
+            "lot": "K101",
+            "bestBefore": "11/12/2026",
+            "error": null,
+            "method": [
+              "best_before:ai_extraction_confirmed_by_human",
+              "lot:ai_extraction_confirmed_by_human"
+            ]
+          },
+          "humanTouches": {
+            "kitchenUpload": 1,
+            "managerConfirmation": 1
+          },
+          "finalStatus": "NEEDS_EVIDENCE",
+          "finalReasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_LISTED",
+            "DATE_CONFLICT"
+          ],
+          "wallClockMs": 51934,
+          "costUsd": 0.174076,
+          "errors": []
+        },
+        {
+          "id": "H17",
+          "ran": true,
+          "skippedReason": null,
+          "expectedRequestFields": [
+            "lot"
+          ],
+          "requestedFields": [
+            "lot"
+          ],
+          "requestedExactly": true,
+          "segments": [
+            {
+              "trigger": "manual",
+              "runStatus": "NEEDS_EVIDENCE",
+              "errorCategory": null,
+              "caseStatusAfter": "NEEDS_EVIDENCE",
+              "tools": [
+                "get_recall_scope",
+                "get_delivery_record",
+                "get_case_evidence",
+                "evaluate_match",
+                "request_evidence",
+                "finish_investigation"
+              ],
+              "elapsedMs": 12064,
+              "costUsd": 0.05218,
+              "tokens": {
+                "input": 9950,
+                "output": 619,
+                "cacheRead": 0,
+                "cacheWrite": 0
+              },
+              "model": "claude-opus-5-5",
+              "summary": "The recorded delivery (delivery:EVAL-DL-117) has GTIN 4056489470458, which is listed in notice:2026-04-0331 (#entry1, #entry2). The best-before date 11/12/2026 lines up with entry2 (lot K101), but no lot was recorded at delivery, so the matcher returned NEEDS_EVIDENCE with lot missing. A label photo showing the lot code has been requested from the kitchen. The delivery record does not prove the product is still in stock. [refs: notice:2026-04-0331, notice:2026-04-0331#entry1, notice:2026-04-0331#entry2, delivery:EVAL-DL-117] [next: await_label_photo]"
+            },
+            {
+              "trigger": "evidence_uploaded",
+              "runStatus": "NEEDS_EVIDENCE",
+              "errorCategory": null,
+              "caseStatusAfter": "NEEDS_EVIDENCE",
+              "tools": [
+                "get_recall_scope",
+                "get_delivery_record",
+                "get_case_evidence",
+                "extract_label",
+                "evaluate_match",
+                "finish_investigation"
+              ],
+              "elapsedMs": 16355,
+              "costUsd": 0.060004,
+              "tokens": {
+                "input": 10331,
+                "output": 934,
+                "cacheRead": 0,
+                "cacheWrite": 0
+              },
+              "model": "claude-opus-5-5",
+              "summary": "The recorded delivery (delivery:EVAL-DL-117) has GTIN 4056489470458 and best-before 11/12/2026, which is listed in notice:2026-04-0331 (#entry1, #entry2). The matcher still returns NEEDS_EVIDENCE because no lot is confirmed. The uploaded photo (document:9fa19aab-92d9-4f98-b7f2-13448f5c47c8) was transcribed as lot \"K101\" (extraction:c7923a70-d936-499f-b5aa-e8e8b38d93bc), which would correspond to #entry2, but this value is UNCONFIRMED and was flagged as ambiguous (1 vs I, 0 vs O). A person must check the lot against the photo; the delivery record does not prove the product is still in stock. [refs: notice:2026-04-0331, notice:2026-04-0331#entry1, notice:2026-04-0331#entry2, delivery:EVAL-DL-117, document:9fa19aab-92d9-4f98-b7f2-13448f5c47c8, extraction:c7923a70-d936-499f-b5aa-e8e8b38d93bc] [next: await_human_confirmation]"
+            },
+            {
+              "trigger": "evidence_confirmed",
+              "runStatus": "COMPLETED",
+              "errorCategory": null,
+              "caseStatusAfter": "RECORDED_MATCH",
+              "tools": [
+                "get_recall_scope",
+                "get_delivery_record",
+                "get_case_evidence",
+                "evaluate_match",
+                "finish_investigation"
+              ],
+              "elapsedMs": 11516,
+              "costUsd": 0.051516,
+              "tokens": {
+                "input": 9724,
+                "output": 631,
+                "cacheRead": 0,
+                "cacheWrite": 0
+              },
+              "model": "claude-opus-5-5",
+              "summary": "The matcher returns RECORDED_MATCH. It used GTIN 4056489470458 and best-before 11/12/2026 from the delivery register (delivery:EVAL-DL-117), plus lot K101 that a person confirmed from the label photo (evidence:1ac4190a-3867-46f8-a297-08a96991a2c8, document:9fa19aab-92d9-4f98-b7f2-13448f5c47c8). Together these match notice:2026-04-0331#entry2. The confirmed best-before (evidence:6324df24-daf8-4d90-ab14-cd8d56c30d73) is the same as the register date. The delivery record does not prove the product is still in stock, so a manager should check stock on site and decide what to do. [refs: notice:2026-04-0331, notice:2026-04-0331#entry2, delivery:EVAL-DL-117, document:9fa19aab-92d9-4f98-b7f2-13448f5c47c8, evidence:1ac4190a-3867-46f8-a297-08a96991a2c8, evidence:6324df24-daf8-4d90-ab14-cd8d56c30d73] [next: manager_review]"
+            }
+          ],
+          "extraction": {
+            "status": "COMPLETED",
+            "model": "claude-opus-5-5",
+            "fields": {
+              "gtin_digits": "4056489470458",
+              "lot_text": "K101",
+              "best_before_text": "11/12/2026",
+              "legible": true
+            },
+            "ambiguous": [
+              {
+                "field": "lot_text",
+                "detail": "Characters after K could be read as '101' or 'I0I'/'1O1' (1 vs I, 0 vs O)."
+              }
+            ],
+            "correct": {
+              "gtin": true,
+              "lot": true,
+              "lotCaseInsensitive": true,
+              "bestBefore": true
+            },
+            "tokens": {
+              "input": 2021,
+              "output": 183
+            },
+            "elapsedMs": 3570
+          },
+          "statusAfterUnconfirmedExtraction": "NEEDS_EVIDENCE",
+          "confirmation": {
+            "lot": "K101",
+            "bestBefore": "11/12/2026",
+            "error": null,
+            "method": [
+              "best_before:ai_extraction_confirmed_by_human",
+              "lot:ai_extraction_confirmed_by_human"
+            ]
+          },
+          "humanTouches": {
+            "kitchenUpload": 1,
+            "managerConfirmation": 1
+          },
+          "finalStatus": "RECORDED_MATCH",
+          "finalReasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_LISTED",
+            "DATE_CONFIRMED"
+          ],
+          "wallClockMs": 44514,
+          "costUsd": 0.1637,
+          "errors": []
+        },
+        {
+          "id": "H18",
+          "ran": true,
+          "skippedReason": null,
+          "expectedRequestFields": [
+            "lot",
+            "best_before"
+          ],
+          "requestedFields": [
+            "lot",
+            "best_before"
+          ],
+          "requestedExactly": true,
+          "segments": [
+            {
+              "trigger": "manual",
+              "runStatus": "NEEDS_EVIDENCE",
+              "errorCategory": null,
+              "caseStatusAfter": "NEEDS_EVIDENCE",
+              "tools": [
+                "get_recall_scope",
+                "get_delivery_record",
+                "get_case_evidence",
+                "evaluate_match",
+                "request_evidence",
+                "finish_investigation"
+              ],
+              "elapsedMs": 11740,
+              "costUsd": 0.052372,
+              "tokens": {
+                "input": 9958,
+                "output": 627,
+                "cacheRead": 0,
+                "cacheWrite": 0
+              },
+              "model": "claude-opus-5-5",
+              "summary": "The recorded delivery's GTIN 4056489470441 appears in notice 2026-04-0331 (entries 3 and 4: lot K099 with best-before 2026-12-09, lot K100 with best-before 2026-12-10). The delivery register has no lot or best-before date, so the matcher returned NEEDS_EVIDENCE with lot and best_before missing. A label photo request for lot and best-before has been sent to the kitchen. The delivery record does not prove the product is still in stock. [refs: notice:2026-04-0331, notice:2026-04-0331#entry3, notice:2026-04-0331#entry4, delivery:EVAL-DL-111] [next: await_label_photo]"
+            },
+            {
+              "trigger": "evidence_uploaded",
+              "runStatus": "NEEDS_EVIDENCE",
+              "errorCategory": null,
+              "caseStatusAfter": "NEEDS_EVIDENCE",
+              "tools": [
+                "get_recall_scope",
+                "get_delivery_record",
+                "get_case_evidence",
+                "extract_label",
+                "evaluate_match",
+                "finish_investigation"
+              ],
+              "elapsedMs": 16342,
+              "costUsd": 0.059344,
+              "tokens": {
+                "input": 10316,
+                "output": 904,
+                "cacheRead": 0,
+                "cacheWrite": 0
+              },
+              "model": "claude-opus-5-5",
+              "summary": "The recorded delivery's GTIN 4056489470441 is listed in notice 2026-04-0331 (entries 3 and 4). The register has no lot or best-before date, so the matcher still returns NEEDS_EVIDENCE. The uploaded label photo has been transcribed, but the values are unconfirmed: lot \"K100\" and best-before 10/12/2026. The transcription flags that the lot characters could be the digits \"100\" or the letters I/O, and the notice allows no character substitutions. A person must check the lot and best-before against the photo and confirm them before the matcher can use them. The delivery record does not prove the product is still in stock. [refs: notice:2026-04-0331, notice:2026-04-0331#entry3, notice:2026-04-0331#entry4, delivery:EVAL-DL-111, document:5b036086-0418-4bde-b392-873cd4bb2e8e, extraction:98d2361e-6a21-4379-b67f-b328ace8010b] [next: await_human_confirmation]"
+            },
+            {
+              "trigger": "evidence_confirmed",
+              "runStatus": "COMPLETED",
+              "errorCategory": null,
+              "caseStatusAfter": "RECORDED_MATCH",
+              "tools": [
+                "get_recall_scope",
+                "get_delivery_record",
+                "get_case_evidence",
+                "evaluate_match",
+                "finish_investigation"
+              ],
+              "elapsedMs": 10917,
+              "costUsd": 0.04922,
+              "tokens": {
+                "input": 9610,
+                "output": 539,
+                "cacheRead": 0,
+                "cacheWrite": 0
+              },
+              "model": "claude-opus-5-5",
+              "summary": "The matcher returns RECORDED_MATCH. It used the register GTIN 4056489470441 (delivery:EVAL-DL-111) and two values a person confirmed from the label photo: lot K100 and best-before 10/12/2026. Together these match notice 2026-04-0331 entry 4 exactly. The delivery record does not prove the product is still in stock, so staff need to check physically for any remaining gourdes, and a manager needs to review the follow-up actions. [refs: notice:2026-04-0331, notice:2026-04-0331#entry4, delivery:EVAL-DL-111, evidence:43573b4c-b486-4d23-b71a-5a7c78a78ee5, evidence:046bc972-5d35-485d-b7d1-d5d5750fbabf, document:5b036086-0418-4bde-b392-873cd4bb2e8e] [next: manager_review]"
+            }
+          ],
+          "extraction": {
+            "status": "COMPLETED",
+            "model": "claude-opus-5-5",
+            "fields": {
+              "gtin_digits": "4056489470441",
+              "lot_text": "K100",
+              "best_before_text": "10/12/2026",
+              "legible": true
+            },
+            "ambiguous": [
+              {
+                "field": "lot_text",
+                "detail": "The characters after K could be read as '100' (digits) or 'IOO'/'1OO' (letters I/O); transcribed as printed appearance 'K100'."
+              }
+            ],
+            "correct": {
+              "gtin": true,
+              "lot": true,
+              "lotCaseInsensitive": true,
+              "bestBefore": true
+            },
+            "tokens": {
+              "input": 2021,
+              "output": 195
+            },
+            "elapsedMs": 3505
+          },
+          "statusAfterUnconfirmedExtraction": "NEEDS_EVIDENCE",
+          "confirmation": {
+            "lot": "K100",
+            "bestBefore": "10/12/2026",
+            "error": null,
+            "method": [
+              "best_before:ai_extraction_confirmed_by_human",
+              "lot:ai_extraction_confirmed_by_human"
+            ]
+          },
+          "humanTouches": {
+            "kitchenUpload": 1,
+            "managerConfirmation": 1
+          },
+          "finalStatus": "RECORDED_MATCH",
+          "finalReasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_LISTED",
+            "DATE_CONFIRMED"
+          ],
+          "wallClockMs": 43867,
+          "costUsd": 0.16093600000000002,
+          "errors": []
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,880 @@
+{
+  "generatedAt": "2026-10-22T11:17:55.498Z",
+  "notice": {
+    "sourceId": "2026-04-0331",
+    "sourceVersion": 1,
+    "retrievedAt": "2026-10-22T09:44:22Z",
+    "entries": [
+      "GTIN 4056489470458 lot k100 (2026-12-10)",
+      "GTIN 4056489470458 lot k101 (2026-12-11)",
+      "GTIN 4056489470441 lot k099 (2026-12-09)",
+      "GTIN 4056489470441 lot k100 (2026-12-10)"
+    ]
+  },
+  "model": {
+    "id": "claude-opus-5-5",
+    "effort": "medium",
+    "promptVersion": "investigator-v1"
+  },
+  "fixture": {
+    "total": 30,
+    "dev": 12,
+    "holdout": 18,
+    "uniqueCases": 28,
+    "devUnique": 11,
+    "holdoutUnique": 17,
+    "duplicateCopies": 2
+  },
+  "dbSeedConsistency": null,
+  "arms": {
+    "nameBaseline": {
+      "metrics": {
+        "dev": {
+          "uniqueCases": 11,
+          "affected": 7,
+          "declaredRecordedMatch": 10,
+          "needsEvidence": 0,
+          "recordedMatchPrecision": {
+            "n": 7,
+            "d": 10,
+            "pct": 70
+          },
+          "triageRecall": {
+            "n": 7,
+            "d": 7,
+            "pct": 100
+          },
+          "confirmedMatchRecall": {
+            "n": 7,
+            "d": 7,
+            "pct": 100
+          },
+          "incorrectExclusionRate": {
+            "n": 0,
+            "d": 7,
+            "pct": 0
+          },
+          "falseAlertRate": {
+            "n": 3,
+            "d": 4,
+            "pct": 75
+          },
+          "agreementWithExpected": {
+            "n": 5,
+            "d": 11,
+            "pct": 45.5
+          }
+        },
+        "holdout": {
+          "uniqueCases": 17,
+          "affected": 9,
+          "declaredRecordedMatch": 17,
+          "needsEvidence": 0,
+          "recordedMatchPrecision": {
+            "n": 9,
+            "d": 17,
+            "pct": 52.9
+          },
+          "triageRecall": {
+            "n": 9,
+            "d": 9,
+            "pct": 100
+          },
+          "confirmedMatchRecall": {
+            "n": 9,
+            "d": 9,
+            "pct": 100
+          },
+          "incorrectExclusionRate": {
+            "n": 0,
+            "d": 9,
+            "pct": 0
+          },
+          "falseAlertRate": {
+            "n": 8,
+            "d": 8,
+            "pct": 100
+          },
+          "agreementWithExpected": {
+            "n": 3,
+            "d": 17,
+            "pct": 17.6
+          }
+        },
+        "overall": {
+          "uniqueCases": 28,
+          "affected": 16,
+          "declaredRecordedMatch": 27,
+          "needsEvidence": 0,
+          "recordedMatchPrecision": {
+            "n": 16,
+            "d": 27,
+            "pct": 59.3
+          },
+          "triageRecall": {
+            "n": 16,
+            "d": 16,
+            "pct": 100
+          },
+          "confirmedMatchRecall": {
+            "n": 16,
+            "d": 16,
+            "pct": 100
+          },
+          "incorrectExclusionRate": {
+            "n": 0,
+            "d": 16,
+            "pct": 0
+          },
+          "falseAlertRate": {
+            "n": 11,
+            "d": 12,
+            "pct": 91.7
+          },
+          "agreementWithExpected": {
+            "n": 8,
+            "d": 28,
+            "pct": 28.6
+          }
+        }
+      },
+      "duplicates": {
+        "copies": 2,
+        "sameStatusAsOriginal": {
+          "n": 2,
+          "d": 2,
+          "pct": 100
+        },
+        "detectedAsDuplicate": {
+          "n": 0,
+          "d": 2,
+          "pct": 0
+        },
+        "details": [
+          {
+            "id": "D12",
+            "duplicateOf": "D01",
+            "status": "RECORDED_MATCH",
+            "originalStatus": "RECORDED_MATCH"
+          },
+          {
+            "id": "H18",
+            "duplicateOf": "H11",
+            "status": "RECORDED_MATCH",
+            "originalStatus": "RECORDED_MATCH"
+          }
+        ]
+      },
+      "failures": [
+        {
+          "id": "D05",
+          "split": "dev",
+          "stage": "before",
+          "got": "RECORDED_MATCH",
+          "expected": "NOT_MATCHING_THIS_NOTICE",
+          "affected": false,
+          "category": "lot_not_listed",
+          "rationale": "GTIN ...458 is listed but lot K102 is not."
+        },
+        {
+          "id": "D06",
+          "split": "dev",
+          "stage": "before",
+          "got": "RECORDED_MATCH",
+          "expected": "NOT_MATCHING_THIS_NOTICE",
+          "affected": false,
+          "category": "lot_under_other_gtin",
+          "rationale": "K101 is listed only under GTIN ...458, not ...441."
+        },
+        {
+          "id": "D07",
+          "split": "dev",
+          "stage": "before",
+          "got": "RECORDED_MATCH",
+          "expected": "NEEDS_EVIDENCE",
+          "affected": true,
+          "category": "missing_lot",
+          "rationale": "No lot or date recorded; label shows K100 10/12/2026, a listed entry."
+        },
+        {
+          "id": "D08",
+          "split": "dev",
+          "stage": "before",
+          "got": "RECORDED_MATCH",
+          "expected": "NEEDS_EVIDENCE",
+          "affected": true,
+          "category": "missing_lot",
+          "rationale": "Lot missing (date recorded); label shows K099, listed for ...441."
+        },
+        {
+          "id": "D09",
+          "split": "dev",
+          "stage": "before",
+          "got": "RECORDED_MATCH",
+          "expected": "NEEDS_EVIDENCE",
+          "affected": false,
+          "category": "missing_lot",
+          "rationale": "Lot missing; label shows K102, not listed for ...458."
+        },
+        {
+          "id": "D11",
+          "split": "dev",
+          "stage": "before",
+          "got": "RECORDED_MATCH",
+          "expected": "NEEDS_EVIDENCE",
+          "affected": true,
+          "category": "date_conflict",
+          "rationale": "Lot K100 is listed for ...441 but the recorded and printed DDM 11/12/2026 contradicts the entry (10/12/2026). A photo cannot reconcile a notice/label contradiction; manager review stays open."
+        },
+        {
+          "id": "H04",
+          "split": "holdout",
+          "stage": "before",
+          "got": "RECORDED_MATCH",
+          "expected": "NOT_MATCHING_THIS_NOTICE",
+          "affected": true,
+          "category": "register_transcription_error",
+          "rationale": "Register says K102 (not listed) but the physical label is K101 (listed). Register-only interpretation is not matching; nothing in the register prompts a photo. Deliberate trap showing the limit of register data."
+        },
+        {
+          "id": "H05",
+          "split": "holdout",
+          "stage": "before",
+          "got": "RECORDED_MATCH",
+          "expected": "NOT_MATCHING_THIS_NOTICE",
+          "affected": false,
+          "category": "same_brand_other_product",
+          "rationale": "Same brand, different product (purée pomme poire) with a GTIN not in the notice, even though its lot code K100 coincides."
+        },
+        {
+          "id": "H06",
+          "split": "holdout",
+          "stage": "before",
+          "got": "RECORDED_MATCH",
+          "expected": "NOT_MATCHING_THIS_NOTICE",
+          "affected": false,
+          "category": "other_brand_similar_name",
+          "rationale": "Different brand with a similar product name and GTIN not in the notice."
+        },
+        {
+          "id": "H07",
+          "split": "holdout",
+          "stage": "before",
+          "got": "RECORDED_MATCH",
+          "expected": "NOT_MATCHING_THIS_NOTICE",
+          "affected": false,
+          "category": "lot_not_listed",
+          "rationale": "GTIN ...441 is listed but lot K098 is not."
+        },
+        {
+          "id": "H08",
+          "split": "holdout",
+          "stage": "before",
+          "got": "RECORDED_MATCH",
+          "expected": "NOT_MATCHING_THIS_NOTICE",
+          "affected": false,
+          "category": "lot_under_other_gtin",
+          "rationale": "K099 is listed only under GTIN ...441, not ...458."
+        },
+        {
+          "id": "H09",
+          "split": "holdout",
+          "stage": "before",
+          "got": "RECORDED_MATCH",
+          "expected": "NEEDS_EVIDENCE",
+          "affected": true,
+          "category": "missing_gtin",
+          "rationale": "No GTIN recorded (brand in name, lot/date recorded); label shows GTIN ...458, so K100 10/12/2026 is a listed entry."
+        },
+        {
+          "id": "H10",
+          "split": "holdout",
+          "stage": "before",
+          "got": "RECORDED_MATCH",
+          "expected": "NEEDS_EVIDENCE",
+          "affected": false,
+          "category": "missing_gtin",
+          "rationale": "No GTIN or lot recorded; label shows GTIN ...441 lot K101, which is not listed for ...441."
+        },
+        {
+          "id": "H11",
+          "split": "holdout",
+          "stage": "before",
+          "got": "RECORDED_MATCH",
+          "expected": "NEEDS_EVIDENCE",
+          "affected": true,
+          "category": "missing_lot",
+          "rationale": "No lot or date recorded; label shows K100 10/12/2026, listed for ...441."
+        },
+        {
+          "id": "H12",
+          "split": "holdout",
+          "stage": "before",
+          "got": "RECORDED_MATCH",
+          "expected": "NEEDS_EVIDENCE",
+          "affected": false,
+          "category": "missing_lot",
+          "rationale": "No lot recorded; label shows K103, not listed."
+        },
+        {
+          "id": "H13",
+          "split": "holdout",
+          "stage": "before",
+          "got": "RECORDED_MATCH",
+          "expected": "NOT_MATCHING_THIS_NOTICE",
+          "affected": false,
+          "category": "o0_lookalike_register",
+          "rationale": "Recorded lot 'K1OO' uses letter O; no O/0 substitution is ever made, so it does not equal k100. The label prints the same letters."
+        },
+        {
+          "id": "H14",
+          "split": "holdout",
+          "stage": "before",
+          "got": "RECORDED_MATCH",
+          "expected": "NEEDS_EVIDENCE",
+          "affected": false,
+          "category": "o0_lookalike_label",
+          "rationale": "No lot recorded; the label prints 'K1OO' with letter O. Read exactly, it is not a listed lot. Extraction should flag the O/0 ambiguity."
+        },
+        {
+          "id": "H15",
+          "split": "holdout",
+          "stage": "before",
+          "got": "RECORDED_MATCH",
+          "expected": "NEEDS_EVIDENCE",
+          "affected": true,
+          "category": "register_label_conflict",
+          "rationale": "Register K100 with DDM 11/12/2026 contradicts the K100 entry; the label shows K101 11/12/2026. Register and label lots disagree, so the case must stay open for manager review rather than letting the newest value win."
+        },
+        {
+          "id": "H16",
+          "split": "holdout",
+          "stage": "before",
+          "got": "RECORDED_MATCH",
+          "expected": "NEEDS_EVIDENCE",
+          "affected": true,
+          "category": "date_conflict",
+          "rationale": "Register K101 with DDM 10/12/2026 contradicts the entry (11/12/2026); the label shows 11/12/2026. Register and label dates disagree; manager review stays open."
+        },
+        {
+          "id": "H17",
+          "split": "holdout",
+          "stage": "before",
+          "got": "RECORDED_MATCH",
+          "expected": "NEEDS_EVIDENCE",
+          "affected": true,
+          "category": "missing_lot",
+          "rationale": "Lot missing (date recorded 11/12/2026); label shows K101, listed for ...458."
+        },
+        {
+          "id": "H18",
+          "split": "holdout",
+          "stage": "before",
+          "got": "RECORDED_MATCH",
+          "expected": "NEEDS_EVIDENCE",
+          "affected": true,
+          "category": "duplicate",
+          "rationale": "Same delivery as H11 recorded twice; should resolve the same way without a second evidence request."
+        }
+      ],
+      "statuses": {
+        "D01": "RECORDED_MATCH",
+        "D02": "RECORDED_MATCH",
+        "D03": "RECORDED_MATCH",
+        "D04": "NOT_MATCHING_THIS_NOTICE",
+        "D05": "RECORDED_MATCH",
+        "D06": "RECORDED_MATCH",
+        "D07": "RECORDED_MATCH",
+        "D08": "RECORDED_MATCH",
+        "D09": "RECORDED_MATCH",
+        "D10": "RECORDED_MATCH",
+        "D11": "RECORDED_MATCH",
+        "D12": "RECORDED_MATCH",
+        "H01": "RECORDED_MATCH",
+        "H02": "RECORDED_MATCH",
+        "H03": "RECORDED_MATCH",
+        "H04": "RECORDED_MATCH",
+        "H05": "RECORDED_MATCH",
+        "H06": "RECORDED_MATCH",
+        "H07": "RECORDED_MATCH",
+        "H08": "RECORDED_MATCH",
+        "H09": "RECORDED_MATCH",
+        "H10": "RECORDED_MATCH",
+        "H11": "RECORDED_MATCH",
+        "H12": "RECORDED_MATCH",
+        "H13": "RECORDED_MATCH",
+        "H14": "RECORDED_MATCH",
+        "H15": "RECORDED_MATCH",
+        "H16": "RECORDED_MATCH",
+        "H17": "RECORDED_MATCH",
+        "H18": "RECORDED_MATCH"
+      }
+    },
+    "structured": {
+      "metrics": {
+        "dev": {
+          "uniqueCases": 11,
+          "affected": 7,
+          "declaredRecordedMatch": 4,
+          "needsEvidence": 4,
+          "recordedMatchPrecision": {
+            "n": 4,
+            "d": 4,
+            "pct": 100
+          },
+          "triageRecall": {
+            "n": 7,
+            "d": 7,
+            "pct": 100
+          },
+          "confirmedMatchRecall": {
+            "n": 4,
+            "d": 7,
+            "pct": 57.1
+          },
+          "incorrectExclusionRate": {
+            "n": 0,
+            "d": 7,
+            "pct": 0
+          },
+          "falseAlertRate": {
+            "n": 1,
+            "d": 4,
+            "pct": 25
+          },
+          "agreementWithExpected": {
+            "n": 11,
+            "d": 11,
+            "pct": 100
+          }
+        },
+        "holdout": {
+          "uniqueCases": 17,
+          "affected": 9,
+          "declaredRecordedMatch": 3,
+          "needsEvidence": 8,
+          "recordedMatchPrecision": {
+            "n": 3,
+            "d": 3,
+            "pct": 100
+          },
+          "triageRecall": {
+            "n": 8,
+            "d": 9,
+            "pct": 88.9
+          },
+          "confirmedMatchRecall": {
+            "n": 3,
+            "d": 9,
+            "pct": 33.3
+          },
+          "incorrectExclusionRate": {
+            "n": 1,
+            "d": 9,
+            "pct": 11.1
+          },
+          "falseAlertRate": {
+            "n": 3,
+            "d": 8,
+            "pct": 37.5
+          },
+          "agreementWithExpected": {
+            "n": 17,
+            "d": 17,
+            "pct": 100
+          }
+        },
+        "overall": {
+          "uniqueCases": 28,
+          "affected": 16,
+          "declaredRecordedMatch": 7,
+          "needsEvidence": 12,
+          "recordedMatchPrecision": {
+            "n": 7,
+            "d": 7,
+            "pct": 100
+          },
+          "triageRecall": {
+            "n": 15,
+            "d": 16,
+            "pct": 93.8
+          },
+          "confirmedMatchRecall": {
+            "n": 7,
+            "d": 16,
+            "pct": 43.8
+          },
+          "incorrectExclusionRate": {
+            "n": 1,
+            "d": 16,
+            "pct": 6.3
+          },
+          "falseAlertRate": {
+            "n": 4,
+            "d": 12,
+            "pct": 33.3
+          },
+          "agreementWithExpected": {
+            "n": 28,
+            "d": 28,
+            "pct": 100
+          }
+        }
+      },
+      "duplicates": {
+        "copies": 2,
+        "sameStatusAsOriginal": {
+          "n": 2,
+          "d": 2,
+          "pct": 100
+        },
+        "detectedAsDuplicate": {
+          "n": 0,
+          "d": 2,
+          "pct": 0
+        },
+        "details": [
+          {
+            "id": "D12",
+            "duplicateOf": "D01",
+            "status": "RECORDED_MATCH",
+            "originalStatus": "RECORDED_MATCH"
+          },
+          {
+            "id": "H18",
+            "duplicateOf": "H11",
+            "status": "NEEDS_EVIDENCE",
+            "originalStatus": "NEEDS_EVIDENCE"
+          }
+        ]
+      },
+      "failures": [
+        {
+          "id": "H04",
+          "split": "holdout",
+          "stage": "before",
+          "got": "NOT_MATCHING_THIS_NOTICE",
+          "expected": "NOT_MATCHING_THIS_NOTICE",
+          "affected": true,
+          "category": "register_transcription_error",
+          "rationale": "Register says K102 (not listed) but the physical label is K101 (listed). Register-only interpretation is not matching; nothing in the register prompts a photo. Deliberate trap showing the limit of register data."
+        }
+      ],
+      "statuses": {
+        "D01": "RECORDED_MATCH",
+        "D02": "RECORDED_MATCH",
+        "D03": "RECORDED_MATCH",
+        "D04": "NOT_MATCHING_THIS_NOTICE",
+        "D05": "NOT_MATCHING_THIS_NOTICE",
+        "D06": "NOT_MATCHING_THIS_NOTICE",
+        "D07": "NEEDS_EVIDENCE",
+        "D08": "NEEDS_EVIDENCE",
+        "D09": "NEEDS_EVIDENCE",
+        "D10": "RECORDED_MATCH",
+        "D11": "NEEDS_EVIDENCE",
+        "D12": "RECORDED_MATCH",
+        "H01": "RECORDED_MATCH",
+        "H02": "RECORDED_MATCH",
+        "H03": "RECORDED_MATCH",
+        "H04": "NOT_MATCHING_THIS_NOTICE",
+        "H05": "NOT_MATCHING_THIS_NOTICE",
+        "H06": "NOT_MATCHING_THIS_NOTICE",
+        "H07": "NOT_MATCHING_THIS_NOTICE",
+        "H08": "NOT_MATCHING_THIS_NOTICE",
+        "H09": "NEEDS_EVIDENCE",
+        "H10": "NEEDS_EVIDENCE",
+        "H11": "NEEDS_EVIDENCE",
+        "H12": "NEEDS_EVIDENCE",
+        "H13": "NOT_MATCHING_THIS_NOTICE",
+        "H14": "NEEDS_EVIDENCE",
+        "H15": "NEEDS_EVIDENCE",
+        "H16": "NEEDS_EVIDENCE",
+        "H17": "NEEDS_EVIDENCE",
+        "H18": "NEEDS_EVIDENCE"
+      },
+      "details": {
+        "D01": {
+          "status": "RECORDED_MATCH",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_LISTED",
+            "DATE_CONFIRMED"
+          ],
+          "missingFields": []
+        },
+        "D02": {
+          "status": "RECORDED_MATCH",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_LISTED",
+            "DATE_CONFIRMED"
+          ],
+          "missingFields": []
+        },
+        "D03": {
+          "status": "RECORDED_MATCH",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_LISTED",
+            "DATE_CONFIRMED"
+          ],
+          "missingFields": []
+        },
+        "D04": {
+          "status": "NOT_MATCHING_THIS_NOTICE",
+          "reasons": [
+            "GTIN_NOT_IN_NOTICE"
+          ],
+          "missingFields": []
+        },
+        "D05": {
+          "status": "NOT_MATCHING_THIS_NOTICE",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_NOT_LISTED"
+          ],
+          "missingFields": []
+        },
+        "D06": {
+          "status": "NOT_MATCHING_THIS_NOTICE",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_NOT_LISTED",
+            "LOT_LISTED_UNDER_OTHER_GTIN_ONLY"
+          ],
+          "missingFields": []
+        },
+        "D07": {
+          "status": "NEEDS_EVIDENCE",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_MISSING"
+          ],
+          "missingFields": [
+            "lot",
+            "best_before"
+          ]
+        },
+        "D08": {
+          "status": "NEEDS_EVIDENCE",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_MISSING"
+          ],
+          "missingFields": [
+            "lot"
+          ]
+        },
+        "D09": {
+          "status": "NEEDS_EVIDENCE",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_MISSING"
+          ],
+          "missingFields": [
+            "lot",
+            "best_before"
+          ]
+        },
+        "D10": {
+          "status": "RECORDED_MATCH",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_LISTED",
+            "DATE_NOT_RECORDED"
+          ],
+          "missingFields": []
+        },
+        "D11": {
+          "status": "NEEDS_EVIDENCE",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_LISTED",
+            "DATE_CONFLICT"
+          ],
+          "missingFields": [
+            "best_before"
+          ]
+        },
+        "D12": {
+          "status": "RECORDED_MATCH",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_LISTED",
+            "DATE_CONFIRMED"
+          ],
+          "missingFields": []
+        },
+        "H01": {
+          "status": "RECORDED_MATCH",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_LISTED",
+            "DATE_CONFIRMED"
+          ],
+          "missingFields": []
+        },
+        "H02": {
+          "status": "RECORDED_MATCH",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_LISTED",
+            "DATE_CONFIRMED"
+          ],
+          "missingFields": []
+        },
+        "H03": {
+          "status": "RECORDED_MATCH",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_LISTED",
+            "DATE_CONFIRMED"
+          ],
+          "missingFields": []
+        },
+        "H04": {
+          "status": "NOT_MATCHING_THIS_NOTICE",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_NOT_LISTED"
+          ],
+          "missingFields": []
+        },
+        "H05": {
+          "status": "NOT_MATCHING_THIS_NOTICE",
+          "reasons": [
+            "GTIN_NOT_IN_NOTICE"
+          ],
+          "missingFields": []
+        },
+        "H06": {
+          "status": "NOT_MATCHING_THIS_NOTICE",
+          "reasons": [
+            "GTIN_NOT_IN_NOTICE"
+          ],
+          "missingFields": []
+        },
+        "H07": {
+          "status": "NOT_MATCHING_THIS_NOTICE",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_NOT_LISTED"
+          ],
+          "missingFields": []
+        },
+        "H08": {
+          "status": "NOT_MATCHING_THIS_NOTICE",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_NOT_LISTED",
+            "LOT_LISTED_UNDER_OTHER_GTIN_ONLY"
+          ],
+          "missingFields": []
+        },
+        "H09": {
+          "status": "NEEDS_EVIDENCE",
+          "reasons": [
+            "GTIN_MISSING"
+          ],
+          "missingFields": [
+            "gtin"
+          ]
+        },
+        "H10": {
+          "status": "NEEDS_EVIDENCE",
+          "reasons": [
+            "GTIN_MISSING"
+          ],
+          "missingFields": [
+            "gtin"
+          ]
+        },
+        "H11": {
+          "status": "NEEDS_EVIDENCE",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_MISSING"
+          ],
+          "missingFields": [
+            "lot",
+            "best_before"
+          ]
+        },
+        "H12": {
+          "status": "NEEDS_EVIDENCE",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_MISSING"
+          ],
+          "missingFields": [
+            "lot",
+            "best_before"
+          ]
+        },
+        "H13": {
+          "status": "NOT_MATCHING_THIS_NOTICE",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_NOT_LISTED"
+          ],
+          "missingFields": []
+        },
+        "H14": {
+          "status": "NEEDS_EVIDENCE",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_MISSING"
+          ],
+          "missingFields": [
+            "lot",
+            "best_before"
+          ]
+        },
+        "H15": {
+          "status": "NEEDS_EVIDENCE",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_LISTED",
+            "DATE_CONFLICT"
+          ],
+          "missingFields": [
+            "best_before"
+          ]
+        },
+        "H16": {
+          "status": "NEEDS_EVIDENCE",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_LISTED",
+            "DATE_CONFLICT"
+          ],
+          "missingFields": [
+            "best_before"
+          ]
+        },
+        "H17": {
+          "status": "NEEDS_EVIDENCE",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_MISSING"
+          ],
+          "missingFields": [
+            "lot"
+          ]
+        },
+        "H18": {
+          "status": "NEEDS_EVIDENCE",
+          "reasons": [
+            "GTIN_IN_NOTICE",
+            "LOT_MISSING"
+          ],
+          "missingFields": [
+            "lot",
+            "best_before"
+          ]
+        }
+      }
+    },
+    "investigation": null
+  }
+}

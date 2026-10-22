@@ -25,7 +25,8 @@ test("three kitchens: match, exclusion, missing label resolved, staff report, re
 
   await page.getByRole("button", { name: "Reset demo" }).click();
   await expect(page.locator("form [role=status]")).toHaveText(/Demo data reset/, { timeout: 30_000 });
-  const row = (site: string) => page.getByRole("row").filter({ hasText: site });
+  // One card (<article>) per kitchen on the overview.
+  const row = (site: string) => page.getByRole("article").filter({ hasText: site });
   await expect(row("Les Lilas")).toContainText("Recorded match");
   await expect(row("Belleville")).toContainText("Not matching this notice");
   await expect(row("Belleville")).toContainText("only under a different GTIN");
@@ -33,16 +34,17 @@ test("three kitchens: match, exclusion, missing label resolved, staff report, re
   await shot(page, "1-overview");
 
   // Investigate the incomplete case: it should request the label.
-  await row("Montreuil").getByRole("link").click();
+  await row("Montreuil").getByRole("link", { name: "Open case" }).click();
   if (AI) {
     await page.getByRole("button", { name: "Run AI investigation" }).click();
-    await expect(page.locator("form [role=status]").first()).toHaveText(/AI investigation: evidence still needed/, { timeout: 150_000 });
+    // The next-step box replaces the button once the run finishes, so wait for the persisted request.
+    await expect(page.getByText(/Photo requested from the kitchen/)).toBeVisible({ timeout: 150_000 });
     await expect(page.getByText(/AI · claude/).first()).toBeVisible();
   } else {
     await page.getByRole("button", { name: "Rule-based check (no AI)" }).click();
     await expect(page.getByText("Rule-based (no AI)").first()).toBeVisible();
   }
-  await expect(page.getByText(/Open evidence request · lot, best_before/)).toBeVisible();
+  await expect(page.getByText(/Photo requested from the kitchen · lot code, best-before date/)).toBeVisible();
   await page.getByRole("button", { name: "Request kitchen stock check" }).click();
   await expect(page.getByRole("link", { name: /kitchen page/ })).toBeVisible();
   const kitchenHref = await page.getByRole("link", { name: /kitchen page/ }).getAttribute("href");

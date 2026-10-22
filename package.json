@@ -13,7 +13,8 @@
     "test": "vitest run",
     "setup:secrets": "tsx scripts/setup-secrets.ts",
     "test:e2e": "playwright test",
-    "ai:smoke": "tsx --env-file=.env.local scripts/ai-smoke.ts"
+    "ai:smoke": "tsx --env-file=.env.local scripts/ai-smoke.ts",
+    "eval": "tsx --env-file=.env.local scripts/evaluate.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.1.0",

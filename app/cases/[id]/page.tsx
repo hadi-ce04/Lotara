@@ -1,18 +1,29 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
-import { ArrowLeft, ExternalLink, FileSearch, Link2 } from "lucide-react";
+import { Suspense, type ReactNode } from "react";
+import {
+  ArrowDown, ArrowLeft, Bot, Camera, ClipboardCheck, ClipboardList, ExternalLink, Hourglass, Link2, ListChecks,
+  MessageSquareText, ScrollText, ShieldAlert, Sparkles, Upload,
+} from "lucide-react";
 import { ActionForm } from "@/components/action-form";
+import { AuditTrail } from "@/components/audit-trail";
 import { AutoRefresh } from "@/components/auto-refresh";
 import { ReplayBanner } from "@/components/banner";
+import { STAFF_ACTION_TEXT, verdict, whyLines } from "@/components/case-copy";
+import { Comparison } from "@/components/comparison";
+import { CopyLink } from "@/components/copy-link";
+import { capitalize, fmtDateTime, fmtDay, fmtTime } from "@/components/format";
+import { InvestigationRuns, MethodChip, runTotals, type Run } from "@/components/investigation-runs";
+import { LabelEvidence } from "@/components/label-evidence";
+import { CaseProgress } from "@/components/progress";
+import { RecalledBatches } from "@/components/recalled-batches";
 import { MatchBadge, ResponseBadge } from "@/components/status";
+import { Card, Disclosure, Eyebrow, Fine, NotRecorded, TopBar } from "@/components/ui";
 import { createParticipantToken, requireManager } from "@/lib/auth";
 import { getCaseDetail } from "@/lib/cases";
-import { REASON_TEXT, type Evaluation, type ReasonCode } from "@/lib/matching/evaluate";
+import type { Evaluation, ReasonCode } from "@/lib/matching/evaluate";
 import { normalizeGtin } from "@/lib/matching/normalize";
 import type { RecallScope } from "@/lib/recalls/scope";
-import { InvestigationRuns } from "@/components/investigation-runs";
-import { LabelEvidence } from "@/components/label-evidence";
 import { AI_MODEL, aiConfigured } from "@/lib/ai/client";
 import {
   aiInvestigateAction, investigateAction, managerUploadAction, markReviewedAction, requestStaffCheckAction,
@@ -22,30 +33,27 @@ export default function CasePage({ params }: PageProps<"/cases/[id]">) {
   return (
     <>
       <ReplayBanner />
-      <Suspense fallback={<p className="mx-auto mt-10 max-w-6xl px-4 text-slate-500">Loading case…</p>}>
+      <TopBar><AutoRefresh /></TopBar>
+      <Suspense fallback={<LoadingCase />}>
         <CaseWorkspace params={params} />
       </Suspense>
     </>
   );
 }
 
-const fmt = (d: string | Date) =>
-  new Date(d).toLocaleString("fr-FR", { dateStyle: "medium", timeStyle: "short", timeZone: "Europe/Paris" });
-
-const ACTION_TEXT: Record<string, string> = {
-  SET_ASIDE: "Set aside affected stock according to the notice",
-  NONE_FOUND: "Checked: none of this product/lot found in stock",
-  COULD_NOT_CHECK: "Could not check",
-};
-
-function Card({ title, children, icon }: { title: string; children: React.ReactNode; icon?: React.ReactNode }) {
+function LoadingCase() {
   return (
-    <section className="rounded-lg border border-slate-200 bg-white p-5">
-      <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-slate-500">{icon}{title}</h2>
-      {children}
-    </section>
+    <div className="mx-auto w-full max-w-6xl space-y-4 px-4 py-8" aria-busy="true">
+      <p className="text-sm text-slate-500">Loading case…</p>
+      <div className="h-56 animate-pulse rounded-xl bg-slate-200/60" />
+      <div className="h-40 animate-pulse rounded-xl bg-slate-200/60" />
+    </div>
   );
 }
+
+const FIELD_NAME: Record<string, string> = { lot: "lot code", best_before: "best-before date", gtin: "barcode" };
+
+type NextKind = "done" | "confirm" | "investigate" | "await_photo" | "review" | "request_check" | "await_report" | "escalated" | "none";
 
 async function CaseWorkspace({ params }: { params: Promise<{ id: string }> }) {
   const manager = await requireManager();
@@ -53,200 +61,341 @@ async function CaseWorkspace({ params }: { params: Promise<{ id: string }> }) {
   if (!/^[0-9a-f-]{36}$/.test(id)) notFound();
   const detail = await getCaseDetail(manager.tenantId, id);
   if (!detail) notFound();
-  const { case: c, documents, evidence, requests, reports, runs, events } = detail;
+  const { case: c, documents, evidence, requests, reports, runs: rawRuns, events } = detail;
+  const runs = rawRuns as Run[];
   const scope: RecallScope = c.normalized_scope;
   const evaluation: Evaluation = c.evaluation;
+  const reasons = c.reason_codes as ReasonCode[];
   const caseGtin = normalizeGtin(c.gtin_raw);
   const openRequest = requests.find((r) => r.status === "OPEN");
   const kitchenLink = `/kitchen/${createParticipantToken(c.site_id)}`;
   const aiAvailable = aiConfigured();
-  const showKitchenLink = c.response_status !== "NOT_REQUESTED" || openRequest;
+  const showKitchenLink = c.response_status !== "NOT_REQUESTED" || Boolean(openRequest);
+  const pendingDoc = documents.find((d) => !d.confirmed);
+  const latestRun = runs[0];
+  const latestReport = reports[0];
+  const viaLabel = evaluation.effective.lot.source === "evidence" || evaluation.effective.bestBefore.source === "evidence";
   const hidden = (extra: Record<string, string | number> = {}) =>
     Object.entries({ caseId: c.id, ...extra }).map(([k, v]) => <input key={k} type="hidden" name={k} value={v} />);
 
-  return (
-    <main className="mx-auto w-full max-w-6xl space-y-6 px-4 py-6">
-      <div className="flex items-center justify-between">
-        <Link href="/" className="inline-flex items-center gap-1 text-sm text-slate-600 hover:underline">
-          <ArrowLeft className="size-4" aria-hidden /> Overview
+  // Latest confirmed value per field (evidence rows are ordered oldest first).
+  const confirmed: Record<string, string> = {};
+  for (const e of evidence) confirmed[e.field_name] = e.raw_value;
+  const hasConfirmed = Object.keys(confirmed).length > 0;
+
+  const m = c.match_status;
+  const r = c.response_status;
+  const next: NextKind =
+    r === "REVIEWED_COMPLETE" ? "done"
+    : pendingDoc ? "confirm"
+    : m === "NEEDS_EVIDENCE" ? (openRequest ? "await_photo" : "investigate")
+    : m === "NOT_MATCHING_THIS_NOTICE" ? "none"
+    : r === "STAFF_REPORTED_ACTION" ? "review"
+    : r === "REQUESTED" ? "await_report"
+    : r === "ESCALATED" ? "escalated"
+    : "request_check";
+  const linkInNext = next === "await_photo" || next === "await_report";
+  const canRequestCheck = m !== "NOT_MATCHING_THIS_NOTICE" && r === "NOT_REQUESTED";
+
+  const kitchenLinkBlock = (
+    <div className="space-y-2">
+      <div className="flex flex-wrap items-center gap-2">
+        <Link href={kitchenLink} target="_blank" className="inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-2 text-sm font-medium text-sky-800 ring-1 ring-sky-300 hover:bg-sky-50">
+          <Link2 className="size-4" aria-hidden /> Open {c.site_name} kitchen page
         </Link>
-        <AutoRefresh />
+        <CopyLink href={kitchenLink} />
       </div>
-      <header className="flex flex-wrap items-center gap-3">
-        <h1 className="text-2xl font-semibold">{c.site_name}</h1>
-        <MatchBadge status={c.match_status} />
-        <ResponseBadge status={c.response_status} />
-        <span className="text-xs text-slate-500">case version {c.version}</span>
+      <Fine>Signed link for this kitchen only, valid 7 days. Share it only with that kitchen.</Fine>
+    </div>
+  );
+
+  const nextStep: Record<NextKind, { title: string; body: ReactNode; icon: ReactNode; tone: string; action?: ReactNode }> = {
+    done: {
+      title: "Reviewed complete",
+      icon: <ClipboardCheck className="size-5" aria-hidden />,
+      tone: "border-emerald-300 bg-emerald-50",
+      body: <>Nothing left to do for this kitchen. You reviewed the kitchen&apos;s report{latestReport ? ` (${STAFF_ACTION_TEXT[latestReport.reported_action].toLowerCase()})` : ""}. A staff report is not independent proof that stock was removed.</>,
+    },
+    confirm: {
+      title: "Confirm what the label says",
+      icon: <ListChecks className="size-5" aria-hidden />,
+      tone: "border-sky-300 bg-sky-50",
+      body: <>A label photo has arrived. Compare it with the AI transcription and type the lot code and best-before date yourself. The result is recalculated from your values.</>,
+      action: (
+        <a href="#evidence" className="inline-flex items-center gap-1.5 rounded-lg bg-slate-900 px-3.5 py-2 text-sm font-medium text-white shadow-sm hover:bg-slate-700">
+          Go to the label check <ArrowDown className="size-4" aria-hidden />
+        </a>
+      ),
+    },
+    investigate: {
+      title: "Find out which batch was delivered",
+      icon: <Sparkles className="size-5" aria-hidden />,
+      tone: "border-amber-300 bg-amber-50",
+      body: aiAvailable
+        ? <>The AI investigator re-reads the notice and the delivery record and, if information is missing, asks the kitchen for a label photo. The decision itself is made by fixed rules, not by the AI.</>
+        : <>AI is not available on this server. The rule-based check does the same checks without AI and asks the kitchen for a label photo if information is missing.</>,
+      action: aiAvailable ? (
+        <ActionForm action={aiInvestigateAction} submitLabel="Run AI investigation" pendingLabel="AI investigating…" className="">{hidden()}</ActionForm>
+      ) : (
+        <ActionForm action={investigateAction} submitLabel="Rule-based check (no AI)" pendingLabel="Checking…" className="">{hidden()}</ActionForm>
+      ),
+    },
+    await_photo: {
+      title: "Waiting for the kitchen's label photo",
+      icon: <Camera className="size-5" aria-hidden />,
+      tone: "border-amber-300 bg-amber-50",
+      body: <>{c.site_name} has been asked to photograph a label showing the {(openRequest?.requested_fields ?? ["lot"]).map((f: string) => FIELD_NAME[f] ?? f).join(" and ")}. Send them their kitchen page link if they don&apos;t have it yet. This page updates by itself when the photo arrives.</>,
+      action: kitchenLinkBlock,
+    },
+    review: {
+      title: "Review the kitchen's report",
+      icon: <MessageSquareText className="size-5" aria-hidden />,
+      tone: "border-indigo-300 bg-indigo-50",
+      body: latestReport ? (
+        <>Kitchen reported: <strong>{STAFF_ACTION_TEXT[latestReport.reported_action]}</strong>
+          {latestReport.quantity_if_known !== null ? ` (${Number(latestReport.quantity_if_known)} ${latestReport.unit ?? ""})` : ""}. If this answers the notice, mark the case reviewed complete. A staff report is not independent verification.</>
+      ) : <>The kitchen has reported. Read it below, then mark the case reviewed complete.</>,
+      action: (
+        <ActionForm action={markReviewedAction} submitLabel="Mark reviewed complete" pendingLabel="Saving…" className="">
+          {hidden({ version: c.version })}
+        </ActionForm>
+      ),
+    },
+    request_check: {
+      title: "Ask the kitchen to check its stock",
+      icon: <ClipboardList className="size-5" aria-hidden />,
+      tone: "border-red-300 bg-red-50",
+      body: <>{c.site_name} received a recalled batch. Ask them to check whether any is left and set it aside as the notice says. They will get a simple page to report what they did.</>,
+      action: (
+        <ActionForm action={requestStaffCheckAction} submitLabel="Request kitchen stock check" pendingLabel="Requesting…" className="">{hidden()}</ActionForm>
+      ),
+    },
+    await_report: {
+      title: "Waiting for the kitchen's stock-check report",
+      icon: <Hourglass className="size-5" aria-hidden />,
+      tone: "border-sky-300 bg-sky-50",
+      body: <>{c.site_name} has been asked to check its stock and report what it did. Send them their kitchen page link if they don&apos;t have it yet.</>,
+      action: kitchenLinkBlock,
+    },
+    escalated: {
+      title: "Escalated",
+      icon: <ShieldAlert className="size-5" aria-hidden />,
+      tone: "border-orange-300 bg-orange-50",
+      body: <>This case was escalated. Follow up with the kitchen directly.</>,
+    },
+    none: {
+      title: "No action required by this notice",
+      icon: <ScrollText className="size-5" aria-hidden />,
+      tone: "border-slate-300 bg-slate-50",
+      body: <>This delivery does not meet the batch criteria of this notice. That is not a safety statement: other notices are checked separately.</>,
+    },
+  };
+  const step = nextStep[next];
+
+  const caveat =
+    m === "NOT_MATCHING_THIS_NOTICE"
+      ? "“Not matching this notice” only means this notice’s exact batch criteria are not met."
+      : "A recorded delivery does not prove the product is still on site.";
+
+  return (
+    <main className="mx-auto w-full max-w-6xl flex-1 space-y-6 px-4 py-6">
+      <Link href="/" className="inline-flex items-center gap-1 text-sm text-slate-600 hover:text-slate-900 hover:underline">
+        <ArrowLeft className="size-4" aria-hidden /> All kitchens (overview)
+      </Link>
+
+      <header className="space-y-2">
+        <Eyebrow>Case · {capitalize(c.title)} · RappelConso {c.source_id}</Eyebrow>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+          <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{c.site_name}</h1>
+          <MatchBadge status={m} size="md" />
+          <ResponseBadge status={r} size="md" />
+        </div>
+        <p className="text-xs text-slate-500">{c.city} · case version {c.version}</p>
       </header>
 
-      <div className="grid gap-6 lg:grid-cols-5">
-        <div className="space-y-6 lg:col-span-3">
-          <Card title="Assessment">
-            <ul className="space-y-1 text-sm">
-              {(c.reason_codes as ReasonCode[]).map((r) => <li key={r}>• {REASON_TEXT[r]}</li>)}
-            </ul>
-            <table className="mt-4 w-full text-sm">
-              <thead className="text-left text-xs text-slate-500">
-                <tr><th className="py-1">Field</th><th>Value used</th><th>Source</th><th>Notice entry</th></tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {([
-                  ["GTIN", evaluation.effective.gtin, evaluation.matchedEntry?.gtinRaw],
-                  ["Lot", evaluation.effective.lot, evaluation.matchedEntry?.lot?.toUpperCase()],
-                  ["Best before", evaluation.effective.bestBefore, evaluation.matchedEntry?.date],
-                ] as const).map(([label, f, notice]) => (
-                  <tr key={label}>
-                    <td className="py-1.5 text-slate-500">{label}</td>
-                    <td className="font-mono">{f.value ?? <em className="font-sans text-amber-800">missing</em>}</td>
-                    <td className="text-xs">{f.source === "evidence" ? "Confirmed label reading" : f.source === "register" ? "Delivery register" : "—"}</td>
-                    <td className="font-mono text-xs">{notice ?? "—"}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </Card>
-
-          <Card title="Official notice scope">
-            <p className="text-sm">
-              <a href={c.source_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-sky-800 underline">
-                RappelConso {c.source_id} v{c.source_version} <ExternalLink className="size-3.5" aria-hidden />
-              </a>{" "}
-              · published {fmt(c.published_at)} · snapshot retrieved {fmt(c.retrieved_at)}
-            </p>
-            <table className="mt-3 w-full text-sm">
-              <thead className="text-left text-xs text-slate-500"><tr><th className="py-1">GTIN</th><th>Lot</th><th>Best before</th></tr></thead>
-              <tbody className="divide-y divide-slate-100 font-mono">
-                {scope.entries.map((e, i) => {
-                  const sameGtin = caseGtin.ok && caseGtin.gtin14 === e.gtin14;
-                  return (
-                    <tr key={i} className={sameGtin ? "bg-sky-50" : ""}>
-                      <td className="py-1">{e.gtinRaw}{sameGtin && <span className="ml-2 font-sans text-xs text-sky-800">this delivery&apos;s GTIN</span>}</td>
-                      <td>{e.lot ? e.lot.toUpperCase() : "all lots"}</td>
-                      <td>{e.date ?? "—"}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-            <p className="mt-3 text-sm"><span className="text-slate-500">Reason (official, French):</span> {c.reason}</p>
-            <p className="text-sm"><span className="text-slate-500">Official instructions:</span> {c.instructions?.split("|").join(" · ")}</p>
-            <p className="mt-2 text-xs text-slate-500">
-              The source dataset lowercases text, so lot codes are compared case-insensitively. No other character
-              substitutions (such as O/0) are made.
-            </p>
-          </Card>
-
-          <Card title="Recorded delivery (synthetic)">
-            <dl className="grid grid-cols-2 gap-x-6 gap-y-1 text-sm">
-              <dt className="text-slate-500">Register reference</dt><dd>{c.source_ref}</dd>
-              <dt className="text-slate-500">Supplier</dt><dd>{c.supplier}</dd>
-              <dt className="text-slate-500">Product (as recorded)</dt><dd>{c.product_name_raw}</dd>
-              <dt className="text-slate-500">GTIN</dt><dd className="font-mono">{c.gtin_raw ?? "—"}</dd>
-              <dt className="text-slate-500">Lot</dt><dd className="font-mono">{c.lot_raw ?? <em className="font-sans text-amber-800">not recorded</em>}</dd>
-              <dt className="text-slate-500">Best before</dt><dd className="font-mono">{c.best_before_raw ?? "—"}</dd>
-              <dt className="text-slate-500">Received</dt><dd>{fmt(c.received_at)} · {Number(c.quantity)} {c.unit}</dd>
-            </dl>
-            <p className="mt-2 text-xs text-slate-500">A historical delivery does not prove the product is still in stock.</p>
-          </Card>
-
-          <Card title="Investigation" icon={<FileSearch className="size-4" aria-hidden />}>
-            <div className="flex flex-wrap gap-2">
-              {aiAvailable && (
-                <ActionForm action={aiInvestigateAction} submitLabel="Run AI investigation" pendingLabel="AI investigating…" className="">
-                  {hidden()}
-                </ActionForm>
-              )}
-              <ActionForm action={investigateAction} submitLabel="Rule-based check (no AI)" pendingLabel="Checking…" variant="secondary" className="">
-                {hidden()}
-              </ActionForm>
+      {/* Situation + next step */}
+      <section aria-labelledby="situation" className="rounded-xl border border-slate-200 bg-white shadow-sm">
+        <div className="grid gap-6 p-5 sm:p-6 lg:grid-cols-5">
+          <div className="space-y-4 lg:col-span-3">
+            <div>
+              <h2 id="situation" className="text-xs font-semibold uppercase tracking-wide text-slate-500">Situation</h2>
+              <p className="mt-1 text-lg font-semibold leading-snug text-slate-900 sm:text-xl">{verdict(m, reasons, { viaLabel })}</p>
+              <p className="mt-1 text-sm text-slate-600">{caveat}</p>
             </div>
-            <p className="mt-2 text-xs text-slate-500">
-              {aiAvailable
-                ? `The AI investigator (${AI_MODEL}) chooses allowlisted tools, at most 8 per segment within 120 s. The deterministic matcher decides status; extracted label values need human confirmation. It resumes automatically after a photo upload or confirmation.`
-                : "AI investigation is unavailable on this server (no API key configured). The rule-based check still works and is labelled as such."}
-            </p>
-            <InvestigationRuns runs={runs} />
-          </Card>
-        </div>
-
-        <div className="space-y-6 lg:col-span-2">
-          <Card title="Evidence">
-            {openRequest ? (
-              <div className="rounded-md bg-amber-50 p-3 text-sm text-amber-950 ring-1 ring-amber-200">
-                <p className="font-medium">Open evidence request · {openRequest.requested_fields.join(", ")}</p>
-                <p className="mt-1">{openRequest.request_text}</p>
-              </div>
-            ) : (
-              <p className="text-sm text-slate-600">No open evidence request.</p>
-            )}
-
-            {documents.map((d) => (
-              <LabelEvidence key={d.id} doc={d} caseId={c.id} version={c.version} aiAvailable={aiAvailable}
-                items={evidence.filter((e) => e.document_id === d.id)} />
-            ))}
-
-            <details className="mt-4 border-t border-slate-100 pt-3 text-sm">
-              <summary className="cursor-pointer text-slate-600">Upload a label photo as manager</summary>
-              <ActionForm action={managerUploadAction} submitLabel="Upload photo" pendingLabel="Uploading…" variant="secondary" className="mt-2 space-y-2">
-                {hidden()}
-                <input type="file" name="photo" accept="image/jpeg,image/png" required className="block text-sm" />
-              </ActionForm>
-            </details>
-          </Card>
-
-          <Card title="Staff response">
-            {c.match_status !== "NOT_MATCHING_THIS_NOTICE" && c.response_status === "NOT_REQUESTED" && (
-              <ActionForm action={requestStaffCheckAction} submitLabel="Request kitchen stock check" pendingLabel="Requesting…">
-                {hidden()}
-              </ActionForm>
-            )}
-            {showKitchenLink && (
-              <p className="mt-3 text-sm">
-                <Link href={kitchenLink} target="_blank" className="inline-flex items-center gap-1 text-sky-800 underline">
-                  <Link2 className="size-4" aria-hidden /> Open {c.site_name} kitchen page
-                </Link>
-                <span className="block text-xs text-slate-500">Signed, site-scoped participant link (valid 7 days). Share only with that kitchen.</span>
-              </p>
-            )}
-            {reports.length === 0 ? (
-              <p className="mt-3 text-sm text-slate-600">No staff report yet.</p>
-            ) : (
-              <ul className="mt-3 space-y-2 text-sm">
-                {reports.map((r) => (
-                  <li key={r.id} className="rounded-md bg-indigo-50 p-3 ring-1 ring-indigo-100">
-                    <p className="font-medium">Participant reported: {ACTION_TEXT[r.reported_action]}</p>
-                    <p className="text-xs">
-                      {r.quantity_if_known !== null ? `${Number(r.quantity_if_known)} ${r.unit ?? ""} · ` : "Quantity not stated · "}
-                      {fmt(r.reported_at)} · {r.actor_id} · {r.confirmation_method.replaceAll("_", " ")}
-                    </p>
-                    {r.note && <p className="mt-1 text-xs">“{r.note}”</p>}
-                    <p className="mt-1 text-xs text-slate-500">A staff report, not independent verification.</p>
-                  </li>
+            <div>
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">Why</h3>
+              <ul className="mt-1 space-y-1 text-sm text-slate-800">
+                {(whyLines(reasons).length ? whyLines(reasons) : ["The barcode is listed in this notice."]).map((w) => (
+                  <li key={w} className="flex gap-2"><span aria-hidden className="mt-2 size-1.5 shrink-0 rounded-full bg-slate-400" />{w}</li>
                 ))}
               </ul>
-            )}
-            {c.response_status === "STAFF_REPORTED_ACTION" && (
-              <ActionForm action={markReviewedAction} submitLabel="Mark reviewed complete" pendingLabel="Saving…" className="mt-4 space-y-2">
-                {hidden({ version: c.version })}
-              </ActionForm>
-            )}
-          </Card>
+              <p className="mt-2 text-xs text-slate-500">
+                Decided by fixed matching rules from {viaLabel ? "the confirmed label reading and the delivery record" : "the delivery record (synthetic)"}.
+                {latestRun && (
+                  <> Last check: <MethodChip run={latestRun} /> at {fmtTime(latestRun.started_at)}{latestRun.status === "RUNNING" && <span className="ml-1 font-medium text-violet-800">Running…</span>}</>
+                )}
+              </p>
+            </div>
+          </div>
 
-          <Card title="Event history">
-            <ol className="space-y-2 text-sm">
-              {events.map((e) => (
-                <li key={e.id} className="border-l-2 border-slate-200 pl-3">
-                  <p className="font-mono text-xs">{e.event_type}</p>
-                  <p className="text-xs text-slate-500">{fmt(e.occurred_at)} · {e.actor_id} · {e.source}</p>
-                  {e.event_type === "case.reassessed" && (
-                    <p className="text-xs">{e.payload.from} → {e.payload.to} ({e.payload.trigger})</p>
-                  )}
+          <div className={`rounded-xl border-2 p-4 lg:col-span-2 ${step.tone}`}>
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">Next step</p>
+            <p className="mt-1 flex items-center gap-2 text-lg font-semibold text-slate-900">{step.icon}{step.title}</p>
+            <p className="mt-2 text-sm leading-relaxed text-slate-700">{step.body}</p>
+            {step.action && <div className="mt-4">{step.action}</div>}
+          </div>
+        </div>
+
+        <div className="border-t border-slate-100 px-5 py-5 sm:px-6">
+          <CaseProgress
+            match={m}
+            response={r}
+            evidence={{ requestOpen: Boolean(openRequest), photoWaitingForConfirmation: Boolean(pendingDoc), usedConfirmedLabel: viaLabel }}
+          />
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2 rounded-b-xl border-t border-slate-100 bg-slate-50 px-5 py-3 sm:px-6">
+          <span className="mr-1 text-xs text-slate-500">Re-check this case:</span>
+          {aiAvailable && next !== "investigate" && (
+            <ActionForm action={aiInvestigateAction} submitLabel="Run AI investigation" pendingLabel="AI investigating…" variant="secondary" size="sm" className="">{hidden()}</ActionForm>
+          )}
+          {!(next === "investigate" && !aiAvailable) && (
+            <ActionForm action={investigateAction} submitLabel="Rule-based check (no AI)" pendingLabel="Checking…" variant="secondary" size="sm" className="">{hidden()}</ActionForm>
+          )}
+          {!aiAvailable && <span className="text-xs text-slate-500">AI investigation is unavailable on this server (no API key configured).</span>}
+        </div>
+      </section>
+
+      {/* Comparison */}
+      <Card title="Recall vs. this delivery" icon={<ListChecks className="size-5 text-slate-500" aria-hidden />}>
+        <p className="mb-3 text-sm text-slate-600">
+          Delivery record {c.source_ref} (synthetic): {c.product_name_raw} from {c.supplier}, received {fmtDay(c.received_at)}, {Number(c.quantity)} {c.unit}.
+        </p>
+        <Comparison
+          entries={scope.entries}
+          caseGtin14={caseGtin.ok ? caseGtin.gtin14 : null}
+          matchedEntry={evaluation.matchedEntry}
+          reasons={reasons}
+          delivery={{ gtin: c.gtin_raw, lot: c.lot_raw, bestBefore: c.best_before_raw }}
+          label={hasConfirmed ? { gtin: confirmed.gtin ?? null, lot: confirmed.lot ?? null, bestBefore: confirmed.best_before ?? null } : null}
+        />
+        <Fine className="mt-3">
+          Lot codes are compared without regard to upper/lower case (the official dataset lowercases them). No other
+          character substitutions, such as O and 0, are made. A recorded delivery does not prove the product is still in stock.
+        </Fine>
+      </Card>
+
+      {/* Evidence */}
+      <Card id="evidence" title="Label evidence" icon={<Camera className="size-5 text-slate-500" aria-hidden />}>
+        <div className="space-y-5">
+          {openRequest && (
+            <div className="rounded-lg bg-amber-50 p-4 text-sm text-amber-950 ring-1 ring-amber-200">
+              <p className="font-semibold">Photo requested from the kitchen · {openRequest.requested_fields.map((f: string) => FIELD_NAME[f] ?? f).join(", ")}</p>
+              <p className="mt-1 leading-relaxed">“{openRequest.request_text}”</p>
+            </div>
+          )}
+          {documents.length === 0 && !openRequest && (
+            <p className="text-sm text-slate-600">
+              {m === "NEEDS_EVIDENCE" ? "No label photo yet. Run the investigation to ask the kitchen for one." : "No label photo was needed: the delivery record was enough to decide."}
+            </p>
+          )}
+          {documents.length === 0 && openRequest && <p className="text-sm text-slate-600">No photo received yet.</p>}
+          {documents.map((d) => (
+            <LabelEvidence key={d.id} doc={d} caseId={c.id} version={c.version} aiAvailable={aiAvailable}
+              items={evidence.filter((e) => e.document_id === d.id)} />
+          ))}
+          <details className="text-sm">
+            <summary className="inline-flex cursor-pointer items-center gap-1.5 text-slate-600 hover:text-slate-900">
+              <Upload className="size-4" aria-hidden /> Upload a label photo yourself
+            </summary>
+            <ActionForm action={managerUploadAction} submitLabel="Upload photo" pendingLabel="Uploading…" variant="secondary" className="mt-3 space-y-2">
+              {hidden()}
+              <input type="file" name="photo" accept="image/jpeg,image/png" required className="block text-sm file:mr-3 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:text-sm file:font-medium" />
+            </ActionForm>
+          </details>
+        </div>
+      </Card>
+
+      {/* Kitchen response */}
+      <Card title="Kitchen response" icon={<ClipboardList className="size-5 text-slate-500" aria-hidden />}>
+        <div className="space-y-4">
+          {m === "NOT_MATCHING_THIS_NOTICE" && <p className="text-sm text-slate-600">No stock check is needed for this notice.</p>}
+          {canRequestCheck && next !== "request_check" && (
+            <div className="flex flex-wrap items-center gap-3">
+              <ActionForm action={requestStaffCheckAction} submitLabel="Request kitchen stock check" pendingLabel="Requesting…" variant="secondary" className="">{hidden()}</ActionForm>
+              <span className="text-xs text-slate-500">Optional now: ask the kitchen to check and set aside the stock while the batch is being confirmed.</span>
+            </div>
+          )}
+          {showKitchenLink && !linkInNext && kitchenLinkBlock}
+          {reports.length === 0 ? (
+            m !== "NOT_MATCHING_THIS_NOTICE" && <p className="text-sm text-slate-600">No report from the kitchen yet.</p>
+          ) : (
+            <ul className="space-y-2 text-sm">
+              {reports.map((rep) => (
+                <li key={rep.id} className="rounded-lg bg-indigo-50 p-4 ring-1 ring-indigo-100">
+                  <p className="font-medium">Participant reported: {STAFF_ACTION_TEXT[rep.reported_action]}</p>
+                  <p className="mt-0.5 text-xs text-slate-600">
+                    {rep.quantity_if_known !== null ? `${Number(rep.quantity_if_known)} ${rep.unit ?? ""} · ` : "Quantity not stated · "}
+                    {fmtDateTime(rep.reported_at)} · {rep.confirmation_method.replaceAll("_", " ")}
+                  </p>
+                  {rep.note && <p className="mt-1 text-sm">“{rep.note}”</p>}
+                  <p className="mt-1 text-xs text-slate-500">A staff report, not independent verification.</p>
                 </li>
               ))}
-            </ol>
-          </Card>
+            </ul>
+          )}
         </div>
+      </Card>
+
+      {/* Technical depth */}
+      <div className="space-y-3">
+        <InvestigationDisclosure runs={runs} aiAvailable={aiAvailable} />
+
+        <Disclosure title="Full notice scope" meta={`${scope.entries.length} recalled batches · RappelConso ${c.source_id} v${c.source_version}`}>
+          <div className="space-y-4 text-sm">
+            <p>
+              <a href={c.source_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-medium text-sky-800 underline">
+                Official notice RappelConso {c.source_id} v{c.source_version} <ExternalLink className="size-3.5" aria-hidden />
+              </a>
+              <span className="text-slate-600"> · published {fmtDateTime(c.published_at)} · saved copy retrieved {fmtDateTime(c.retrieved_at)}{c.replay ? " · historical replay" : ""}</span>
+            </p>
+            <RecalledBatches entries={scope.entries} highlightGtin14={caseGtin.ok ? caseGtin.gtin14 : null} />
+            <dl className="grid gap-x-4 gap-y-1 sm:grid-cols-[auto_1fr]">
+              <dt className="text-slate-500">Reason (official, French)</dt><dd>{c.reason}</dd>
+              <dt className="text-slate-500">Instructions (official, French)</dt><dd>{c.instructions?.split("|").join(" · ")}</dd>
+              <dt className="text-slate-500">Delivery record</dt>
+              <dd>
+                {c.source_ref} · {c.supplier} · {c.product_name_raw} · barcode <span className="font-mono">{c.gtin_raw ?? "—"}</span> · lot{" "}
+                {c.lot_raw ? <span className="font-mono">{c.lot_raw}</span> : <NotRecorded />} · best before{" "}
+                {c.best_before_raw ? <span className="font-mono">{c.best_before_raw}</span> : <NotRecorded />} · received {fmtDateTime(c.received_at)}
+              </dd>
+            </dl>
+          </div>
+        </Disclosure>
+
+        <Disclosure title="Audit trail" meta={`${events.length} events`}>
+          <AuditTrail events={events} />
+        </Disclosure>
       </div>
     </main>
+  );
+}
+
+function InvestigationDisclosure({ runs, aiAvailable }: { runs: Run[]; aiAvailable: boolean }) {
+  const aiRuns = runs.filter((r) => r.method.startsWith("ai"));
+  const t = runTotals(runs);
+  const title = aiRuns.length > 0 ? "How the AI investigated" : "How this case was checked";
+  const meta = runs.length === 0
+    ? "not run yet"
+    : `${runs.length} run${runs.length === 1 ? "" : "s"} · ${t.steps} steps${t.tokens ? ` · ${t.tokens.toLocaleString("en")} tokens` : ""}${t.cost ? ` · ≈$${t.cost.toFixed(3)} est.` : ""}`;
+  return (
+    <Disclosure title={<span className="inline-flex items-center gap-2"><Bot className="size-4 text-violet-700" aria-hidden />{title}</span>} meta={meta}>
+      <p className="mb-4 text-xs leading-relaxed text-slate-600">
+        {aiAvailable
+          ? `The AI investigator (${AI_MODEL}) may only use a fixed list of tools, at most 8 per run and within 120 s. The match status is always decided by the fixed matching rules; label values read by the AI need a person's confirmation. It resumes by itself after a photo upload or a confirmation.`
+          : "AI investigation is unavailable on this server (no API key configured). The rule-based check runs the same steps without AI and is labelled as such."}
+      </p>
+      <InvestigationRuns runs={runs} />
+    </Disclosure>
   );
 }
