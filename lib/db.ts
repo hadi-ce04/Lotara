@@ -5,14 +5,11 @@ import { Pool, type PoolClient } from "pg";
 // the parsed connection string last), silently dropping CA verification.
 const URL_SSL_PARAMS = ["sslmode", "sslrootcert", "sslcert", "sslkey", "ssl", "uselibpqcompat"];
 
-function requireEnv(name: string): string {
-  const value = process.env[name]?.trim();
-  if (!value) throw new Error(`Missing required environment variable ${name}`);
-  return value;
-}
-
 function connectionString(): string {
-  const url = new URL(requireEnv("AIVEN_DATABASE_URL"));
+  // Aiven Runtime's service integration exposes the URI as DATABASE_URL by default.
+  const raw = process.env.AIVEN_DATABASE_URL?.trim() || process.env.DATABASE_URL?.trim();
+  if (!raw) throw new Error("Missing required environment variable AIVEN_DATABASE_URL (or DATABASE_URL)");
+  const url = new URL(raw);
   for (const param of URL_SSL_PARAMS) url.searchParams.delete(param);
   return url.toString();
 }
