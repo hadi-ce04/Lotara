@@ -37,6 +37,7 @@ export function getPool(): Pool {
     const pool = new Pool({
       connectionString: connectionString(),
       ssl: { rejectUnauthorized: true, ca: caCertificate() },
+      options: "-c search_path=lotara,public",
       max: 5,
       connectionTimeoutMillis: 10_000,
       idleTimeoutMillis: 30_000,

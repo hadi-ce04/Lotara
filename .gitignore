@@ -45,3 +45,7 @@ next-env.d.ts
 /certs/
 *.crt
 *.key
+
+# playwright
+/test-results/
+/playwright-report/

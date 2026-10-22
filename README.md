@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Lotara
 
-## Getting Started
+Hackathon prototype (Paris AI Innovate, October 2026). Lotara helps a manager of several nursery kitchens turn a
+product-recall notice into a targeted, evidence-backed response. See [Blueprint.md](Blueprint.md) for the plan.
 
-First, run the development server:
+**Status: reduced MVP.** It is not a validated food-safety system. It does not certify food as safe, and it does not
+verify that stock was removed.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## What works today
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **Real notice, replayed.** RappelConso notice [2026-04-0331](https://rappel.conso.gouv.fr/fiche-rappel/22174/interne)
+  (Les Vergers Gourmands compote bio) is saved in `fixtures/development/` with its retrieval time. It is replayed as
+  history, not presented as a new alert.
+- **Three synthetic kitchens.** Deliveries are fictional and labelled synthetic.
+- **Deterministic three-way matching** (`lib/matching/evaluate.ts`) on the notice's (GTIN, lot, best-before) entries:
+  - Les Lilas: recorded match.
+  - Belleville: not matching this notice. Its lot is listed only under the notice's other GTIN.
+  - Montreuil: needs evidence, because no lot was recorded at delivery.
+- **Bounded rule-based investigation.** At most 6 persisted steps. It creates one targeted request for missing evidence.
+- **Label photo upload** from the kitchen page, stored privately in PostgreSQL. A person reads the photo and confirms
+  the lot and best-before date, which triggers reassessment. Contradictory evidence reopens review.
+- **Typed staff report.** The participant confirms the report and it is deduplicated. Only a manager can mark
+  *reviewed complete*, and only once the evidence is resolved.
+- **Event history.** Every state change is written in the same transaction as its event, with optimistic version checks.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Deferred: AI Gateway/model-assisted label extraction, ElevenLabs voice, Supabase Storage, CSV import, evaluation runs.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Stack
 
-## Learn More
+Next.js 16 (App Router, Cache Components), TypeScript, Tailwind v4, `pg` against **Aiven for PostgreSQL** with TLS
+certificate verification. Tables live in the `lotara` schema of the existing database. Deployed as a container to
+**Aiven Runtime**.
 
-To learn more about Next.js, take a look at the following resources:
+## Local setup
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. `npm ci`
+2. Put the Aiven service URI in `.env.local` as `AIVEN_DATABASE_URL=...`. Save the project CA certificate to
+   `certs/aiven-ca.pem`, with `AIVEN_CA_CERT_PATH=certs/aiven-ca.pem`. Both files are git-ignored. See `.env.example`.
+3. `npm run setup:secrets` prompts for a demo admin password (not echoed). It writes the password hash plus the session
+   and participant secrets into `.env.local`.
+4. `npm run db:check` runs `SELECT 1` over verified TLS. `npm run db:migrate` applies `db/migrations`.
+5. `npm run dev`, sign in, then click **Reset demo**.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Tests
 
-## Deploy on Vercel
+- `npm test` runs unit tests (matching, adapter) and the database flow test. The flow test uses an isolated `itest`
+  tenant and needs `.env.local`.
+- `npm run test:e2e` runs a Playwright browser test of the whole journey. **It resets the `demo` tenant.**
+  - It signs in with a throwaway password generated for each run.
+  - To test a running container instead, set `E2E_BASE_URL` and `E2E_ADMIN_PASSWORD`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Deploying to Aiven Runtime
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The `Dockerfile` builds Next.js standalone output and runs it as a non-root user on **port 8080**. Runtime secrets:
+
+| Variable | Value |
+|---|---|
+| `DATABASE_URL` | Provided by connecting the `lotara-pg` service to the app. Or set `AIVEN_DATABASE_URL` as a secret. |
+| `AIVEN_CA_CERT_BASE64` | Base64 of the project CA PEM (`base64 -w0 certs/aiven-ca.pem`) |
+| `DEMO_ADMIN_PASSWORD_HASH`, `SESSION_SECRET`, `PARTICIPANT_TOKEN_SECRET` | From `.env.local` after `npm run setup:secrets` |
+
+Pushing does not redeploy. After pushing, choose **Actions → Deploy latest commit**. `GET /api/health` returns
+`{"status":"ok"}` when the database is reachable.
+
+The demo label images in `public/demo/` are synthetic (`scripts/make-demo-label.py`).
