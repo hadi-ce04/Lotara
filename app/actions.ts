@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import {
   endManagerSession, getManager, startManagerSession, verifyParticipantToken, verifyPassword,
 } from "@/lib/auth";
+import { describePasswordHash } from "@/lib/password";
 import {
   CaseError, confirmLabelReading, investigateCase, markReviewed, requestStaffCheck, resetDemo,
   submitStaffReport, uploadLabelPhoto, type StaffAction,
@@ -38,6 +39,11 @@ const str = (form: FormData, key: string) => {
 };
 
 export async function loginAction(_: ActionState, form: FormData): Promise<ActionState> {
+  const hashState = describePasswordHash(process.env.DEMO_ADMIN_PASSWORD_HASH);
+  if (hashState === "missing" || hashState === "malformed") {
+    console.error(`login unavailable: DEMO_ADMIN_PASSWORD_HASH is ${hashState}`);
+    return { error: `Sign-in is not configured on this server (admin password hash ${hashState}).` };
+  }
   if (!verifyPassword(str(form, "password"), process.env.DEMO_ADMIN_PASSWORD_HASH)) {
     return { error: "Incorrect password" };
   }

@@ -7,7 +7,8 @@ export { verifyPassword } from "./password";
 // Demo-grade authentication: one protected manager workspace plus signed,
 // site-scoped participant links for kitchens. Not production identity.
 
-export const DEMO_TENANT = "demo";
+// Browser tests run in their own tenant (DEMO_TENANT_ID=e2e) so they never reset the live demo.
+export const DEMO_TENANT = process.env.DEMO_TENANT_ID?.trim() || "demo";
 export const MANAGER_ACTOR = "demo-manager";
 const SESSION_COOKIE = "lotara_session";
 const SESSION_TTL_S = 12 * 60 * 60;

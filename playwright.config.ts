@@ -20,6 +20,7 @@ export default defineConfig({
         timeout: 120_000,
         reuseExistingServer: false,
         env: {
+          DEMO_TENANT_ID: "e2e",
           DEMO_ADMIN_PASSWORD_HASH: hashPassword(password),
           SESSION_SECRET: randomBytes(32).toString("base64url"),
           PARTICIPANT_TOKEN_SECRET: randomBytes(32).toString("base64url"),

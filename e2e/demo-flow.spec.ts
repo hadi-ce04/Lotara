@@ -4,8 +4,14 @@ import { expect, test, type Page } from "@playwright/test";
 const shot = (p: Page, name: string) =>
   process.env.E2E_SCREENSHOTS ? p.screenshot({ path: `test-results/screens/${name}.png`, fullPage: true }) : null;
 
-// Full reduced-MVP journey in a real browser against the real database.
-// Note: this resets the demo tenant's data.
+// Full journey in a real browser against the real database. It resets the tenant it runs in:
+// the local webServer uses the isolated "e2e" tenant. Against a deployed URL (E2E_BASE_URL) the
+// server's tenant is unknown, so the run must be explicitly allowed.
+test.skip(
+  Boolean(process.env.E2E_BASE_URL) && process.env.E2E_ALLOW_RESET !== "1",
+  "Refusing to reset data on E2E_BASE_URL without E2E_ALLOW_RESET=1 (run the server with DEMO_TENANT_ID=e2e)",
+);
+
 test("three kitchens: match, exclusion, missing label resolved, staff report, review", async ({ page, context }) => {
   await page.goto("/");
   await expect(page).toHaveURL(/\/login$/);
