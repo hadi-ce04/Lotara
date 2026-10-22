@@ -1,118 +1,147 @@
 # Lotara
 
-Hackathon prototype (Paris AI Innovate, October 2026). Lotara helps the manager of several nursery kitchens turn a
-product-recall notice into a targeted, evidence-backed response. Plan and rationale: [Blueprint.md](Blueprint.md).
+**Recall response for nursery kitchens.** A food recall names exact batches: a barcode and a lot number. Lotara finds which kitchens received an affected batch, sends an AI investigator to collect the evidence that is missing, and tracks every kitchen's confirmed response until a manager closes the case.
 
-**This is a prototype, not a food-safety system.** It does not certify food as safe and does not verify that stock was
-removed. The notice is real but replayed; kitchens, staff and deliveries are synthetic.
+Built for the Paris AI Innovate hackathon (October 2026). Hosted on **Aiven Runtime** with **Aiven for PostgreSQL**; the AI runs on **Claude** through the Anthropic API.
 
-## What works
+| | |
+|---|---|
+| Live site (no login) | [lotara on Aiven: /welcome](https://01a16320-7504-70fc-b08b-06bc2a4c1c84-8080.eur-1.aiven.app/welcome) |
+| Manager demo | [/login](https://01a16320-7504-70fc-b08b-06bc2a4c1c84-8080.eur-1.aiven.app/login) (demo password shared with judges) |
+| 3-minute demo video | [docs/submission/lotara-demo.mp4](docs/submission/lotara-demo.mp4) |
+| Pitch slide | [PNG](docs/submission/slide.png) · [PPTX](docs/submission/lotara-pitch.pptx) · [PDF](docs/submission/slide.pdf) |
+| Measured results | [docs/RESULTS.md](docs/RESULTS.md) |
 
-- **Real notice, replayed.** RappelConso [2026-04-0331](https://rappel.conso.gouv.fr/fiche-rappel/22174/interne)
-  (Les Vergers Gourmands compote bio) is saved in `fixtures/development/` with publication and retrieval times. The
-  UI labels it as a historical replay.
-- **Deterministic three-way matching** (`lib/matching/evaluate.ts`) on the notice's (GTIN, lot, best-before) entries:
-  - Les Lilas: **recorded match**.
-  - Belleville: **not matching this notice**, because its lot K101 is listed only under the other GTIN. A name-only
-    matcher gets this case wrong.
-  - Montreuil: **needs evidence**, because no lot was recorded at delivery.
-- **AI investigator** (`lib/ai/investigate.ts`). A bounded tool loop on one case, calling the Anthropic API directly:
-  - It uses seven allowlisted, case-scoped tools with Zod-validated inputs: `get_recall_scope`,
-    `get_delivery_record`, `get_case_evidence`, `extract_label`, `evaluate_match`, `request_evidence`,
-    `finish_investigation`.
-  - Each segment is limited to 8 tool calls, 8 model turns and 120 s.
-  - The deterministic evaluator is the authority. `finish_investigation` is rejected if its conclusion differs from
-    the evaluator, if it cites refs that no tool returned, or if the summary says "safe".
-  - Every model turn and tool step is persisted with its tokens. The run shows an estimated cost.
-  - A segment resumes automatically after a label upload or a confirmation (at most 4 automatic segments per case
-    per 15 minutes; at most 5 photos per case).
-- **Rule-based check (no AI).** The fallback when no API key is set. It is labelled as such in the UI.
-- **Label photo upload** from the kitchen link (JPEG/PNG up to 4 MB), stored privately in PostgreSQL.
-  - AI transcription (`lib/ai/extract.ts`) is shown as *unconfirmed* and flags ambiguous characters (O/0, I/1…).
-    Confirmation inputs are never pre-filled: the person types what they read, and the record notes whether it
-    agreed with the AI transcription.
-  - A person confirms the values, which triggers deterministic reassessment. Contradictory evidence reopens review.
-- **Typed staff report** with explicit confirmation, deduplicated by a per-form idempotency key. Only the manager can
-  mark *reviewed complete*, and only after evidence is resolved and a staff report exists.
-- **Event history.** Each state change is written in the same transaction as its event, with optimistic version
-  checks.
+![Manager overview: three kitchens, one recall](docs/images/overview.png)
 
-**Not implemented / deferred:**
+> This is a prototype, not a food-safety system. It never certifies food as safe and does not verify that stock was removed. The recall notice is real and replayed from a saved copy; kitchens, staff and deliveries are synthetic.
 
-- Voice (ElevenLabs).
-- Supabase storage (photos live in PostgreSQL).
-- Vercel AI Gateway.
-- CSV import.
-- Unattended background workers and live source polling.
+## The problem
 
-## Architecture
+When a product is recalled, an operations lead coordinating several nursery kitchens has to answer one question fast: **which of our kitchens received the affected batch, and has someone acted?**
 
-- **App:** Next.js 16 (App Router, server actions), TypeScript, Tailwind v4. Built from the `Dockerfile` as a
-  standalone container running as a non-root user on **port 8080** on **Aiven Runtime**.
-- **Data:** **Aiven for PostgreSQL**, tables in the `lotara` schema (`db/migrations`). TLS uses certificate
-  verification against the project CA, and `sslmode` URL parameters are ignored.
-- **AI:** `@anthropic-ai/sdk` calling the Anthropic API directly. The model defaults to `claude-opus-5-5`
-  (`ANTHROPIC_MODEL`), and effort to `medium` (`ANTHROPIC_EFFORT`). The server-side refusal fallback is enabled, and
-  the model that actually answered is recorded on each run.
-- **Auth:** one demo manager password (scrypt hash) with an HTTP-only session. Kitchens use signed, site-scoped
-  participant links (valid 7 days).
+- Recalls list batches, not brands. Searching by product name flags every kitchen that ever bought the product.
+- Lot codes are often not written down at delivery, so the honest answer is "unknown" until someone checks the label.
+- Follow-up across sites happens by phone, with no record of who checked what.
 
-## Local setup
+## How it works
+
+```mermaid
+flowchart LR
+  N[Official recall notice<br/>RappelConso, saved snapshot] --> R[Exact recall criteria<br/>barcode + lot + date]
+  D[Kitchen deliveries] --> M
+  R --> M{Deterministic matcher}
+  M -->|listed batch| A[Recorded match]
+  M -->|not listed| B[Not matching this notice]
+  M -->|lot unknown| C[Needs evidence]
+  C --> AI[AI investigator<br/>7 allowlisted tools]
+  AI -->|requests label photo| K[Kitchen uploads photo]
+  K --> X[AI reads label<br/>marked UNCONFIRMED]
+  X --> H[Person confirms values]
+  H --> M
+  A --> S[Kitchen stock-check report]
+  S --> V[Manager review]
+```
+
+1. **Notice in.** A real French government recall (RappelConso 2026-04-0331, compote bio) is saved with its publication and retrieval times and normalised into exact (barcode, lot, best-before) entries.
+2. **Exact matching.** Deterministic rules compare every recorded delivery with those entries and write one case per kitchen: *Recorded match*, *Not matching this notice* or *Needs evidence*.
+3. **AI investigation.** For a case with missing information, an AI agent works through seven allowlisted tools scoped to that single case. It reads the criteria and the delivery record, runs the matcher, and asks that kitchen for a label photo naming exactly the fields it needs.
+4. **Evidence.** The kitchen uploads a photo from its phone. The AI transcribes it, marks every value as unconfirmed, and flags look-alike characters such as O and 0. A person types what the label shows; the rules re-check the case.
+5. **Response.** The kitchen sends a typed stock-check report (recorded once, even if sent twice). Only the manager can mark the case *reviewed complete*.
+
+| Case workspace | Kitchen page |
+|---|---|
+| ![Case workspace with situation, comparison and AI steps](docs/images/case.png) | ![Kitchen page](docs/images/kitchen.png) |
+
+## What the AI may and may not do
+
+The model is useful because it is constrained.
+
+- **It chooses tools; it never decides status.** Only the deterministic matcher writes *Recorded match*, *Not matching this notice* or *Needs evidence*. The investigator's final summary is rejected if it contradicts the matcher, cites evidence a tool did not return, or calls a product "safe".
+- **Unconfirmed is unconfirmed.** A label transcription never changes a case until a person confirms the values. The confirmation form is never pre-filled from the model.
+- **Narrow, scoped tools.** `get_recall_scope`, `get_delivery_record`, `get_case_evidence`, `extract_label`, `evaluate_match`, `request_evidence`, `finish_investigation`. Inputs are validated with Zod. Tenant and case come from the server, never from the model. No SQL, no URLs, no credentials.
+- **Bounded runs.** At most 8 tool calls, 8 model turns and 120 seconds per segment, with automatic segments capped per case. Every model turn and tool call is persisted with timing, tokens and estimated cost.
+- **Kitchen-facing text is a server template.** Model output is shown only to the manager.
+
+## Measured results
+
+28 unique synthetic delivery cases against the real notice, 16 of them affected (dev/holdout split, gold labels kept separate from the agent). The AI arm ran end to end on the real database with Claude.
+
+| | Name-only matching | Exact rules on records | Lotara: rules + AI evidence |
+|---|---|---|---|
+| Declared matches that were correct | 16/27 | 7/7 | **11/11** |
+| False alarms on unaffected cases | 11/12 | 4/12 | **1/12** |
+| Affected kitchens confirmed with evidence | 16/16 (by flagging almost everything) | 7/16 | **11/16** |
+| Missing-evidence cases resolved | n/a | n/a | **7/9** |
+
+The AI transcribed 13 of 13 labels exactly and never changed a status without human confirmation. Model usage was about US$0.18 per investigated case. Misses are listed individually in [docs/RESULTS.md](docs/RESULTS.md), including one affected case no arm caught (the delivery record had the wrong lot) and two cases that need a barcode confirmation the prototype does not accept yet. Synthetic data, simulated confirmations and a single notice: these are prototype measurements, not real-world performance.
+
+![Evidence chart](docs/submission/evidence.png)
+
+## The data layer on Aiven
+
+Everything lives in one Aiven for PostgreSQL database, in the `lotara` schema ([db/migrations](db/migrations)):
+
+| Table | Holds |
+|---|---|
+| `recall_versions` | Raw notice snapshot, normalised criteria, publication and retrieval times |
+| `received_lots` | Recorded deliveries per kitchen, with original and normalised identifiers |
+| `cases` | One case per kitchen and notice: match status, response status, reasons, version |
+| `documents`, `label_extractions`, `evidence_items` | Private label photos, raw AI transcriptions, human-confirmed values |
+| `evidence_requests`, `staff_reports`, `contact_attempts` | What was asked of each kitchen and what it reported |
+| `investigation_runs`, `run_steps` | Every AI segment, model turn and tool call with usage and cost |
+| `event_log` | Audit trail; each state change is written in the same transaction |
+
+The app connects with TLS certificate verification against the Aiven project CA (`sslmode` parameters in the URL are deliberately ignored). Optimistic version checks stop a stale update from overwriting newer evidence.
+
+## Tech stack
+
+Next.js 16 (App Router, server actions, Cache Components) · TypeScript · Tailwind CSS v4 · `pg` · `@anthropic-ai/sdk` (model `claude-opus-5-5`, configurable) · Zod · Vitest · Playwright · Docker (standalone output, non-root, port 8080) · Aiven Runtime · Aiven for PostgreSQL.
+
+## Run it locally
 
 1. `npm ci`
-2. Create `.env.local` (git-ignored):
-   - `AIVEN_DATABASE_URL`: the Aiven service URI;
-   - `AIVEN_CA_CERT_PATH=certs/aiven-ca.pem`: the project CA saved to `certs/`, which is also ignored;
-   - `ANTHROPIC_API_KEY`: optional; without it, only the rule-based check runs.
-3. `npm run setup:secrets` prompts for the demo admin password (not echoed). It writes `DEMO_ADMIN_PASSWORD_HASH`
-   (format `scrypt:<salt>:<hash>`, with no `$`), `SESSION_SECRET` and `PARTICIPANT_TOKEN_SECRET` to `.env.local`.
-   It also writes the raw Runtime values to the ignored `secrets/aiven-runtime-secrets.txt`. Flags:
-   - `-- --upgrade-hash` converts a legacy `scrypt$…` hash (same password, no prompt);
-   - `-- --export` only rewrites the export file;
-   - `-- --rotate` also regenerates the session and participant secrets.
-4. `npm run db:check` (`SELECT 1` over verified TLS), then `npm run db:migrate`.
-5. `npm run ai:smoke` makes one small text call and one vision call on the synthetic label. It is billed.
-6. `npm run dev`, sign in, then click **Reset demo**.
+2. Create `.env.local` (git-ignored) with `AIVEN_DATABASE_URL`, `AIVEN_CA_CERT_PATH=certs/aiven-ca.pem` (save the project CA there; also ignored) and optionally `ANTHROPIC_API_KEY`. See [.env.example](.env.example).
+3. `npm run setup:secrets` prompts for a demo admin password (not echoed) and writes its hash and the session secrets. Flags: `--upgrade-hash`, `--export`, `--rotate`.
+4. `npm run db:check` (SELECT 1 over verified TLS), then `npm run db:migrate`.
+5. `npm run dev`, sign in, click **Reset demo**.
 
-## Tests
+Without an API key, the AI actions report "unavailable" and a clearly labelled rule-based check still works.
 
-- `npm test`: unit tests plus the database flow test, using the isolated `itest` tenant and `.env.local`. It makes
-  no paid AI calls. `RUN_AI_TESTS=1 npm test` also runs the real, billed AI flow test.
-- `npm run test:e2e`: a Playwright run of the full journey against a local dev server. It uses the isolated `e2e`
-  tenant and a throwaway password, with AI disabled. `E2E_AI=1` uses the real model.
-  - To test a deployed URL, set `E2E_BASE_URL` and `E2E_ADMIN_PASSWORD`. The test refuses to reset that server's
-    data unless `E2E_ALLOW_RESET=1`.
+## Tests and evaluation
 
-## Deploying to Aiven Runtime
-
-Connect the GitHub repository and build with the `Dockerfile`, exposing port 8080. Set these runtime variables. Copy
-the raw values from `secrets/aiven-runtime-secrets.txt`, with no quotes:
-
-| Variable | Value |
+| Command | What it does |
 |---|---|
-| `DATABASE_URL` | Provided by the service integration with the PostgreSQL service (or set `AIVEN_DATABASE_URL` as a secret) |
-| `AIVEN_CA_CERT_BASE64` | Base64 of the project CA PEM |
-| `ANTHROPIC_API_KEY` | Secret. Without it, AI actions report "unavailable" and the rule-based check still works |
-| `ANTHROPIC_MODEL`, `ANTHROPIC_EFFORT` | Optional (defaults `claude-opus-5-5`, `medium`) |
-| `DEMO_ADMIN_PASSWORD_HASH`, `SESSION_SECRET`, `PARTICIPANT_TOKEN_SECRET` | Secrets, from `npm run setup:secrets` |
-| `NODE_ENV`, `NEXT_TELEMETRY_DISABLED` | `production`, `1` (already set in the image) |
+| `npm test` | Unit tests, the real-database flow test (isolated tenant) and the deterministic evaluation arms. No paid calls. |
+| `RUN_AI_TESTS=1 npm test` | Adds the real AI investigator flow test. |
+| `npm run test:e2e` | Playwright journey in an isolated `e2e` tenant. `E2E_AI=1` uses the real model. |
+| `npm run eval` | Full benchmark: name-only, exact rules, and AI with evidence collection. Writes [docs/RESULTS.md](docs/RESULTS.md). |
+| `npm run ai:smoke` | One small text call and one vision call. |
 
-**Pushing does not deploy.** After pushing, choose **Deploy latest commit** explicitly. Then open `GET /api/health`:
-- `release` should match `lib/release.ts`;
-- `database.ok` should be true;
-- `config` reports only categories and booleans (password hash `ok`, secrets present, API key present), never
-  values.
+## Deploy to Aiven Runtime
 
-## Evaluation
+Connect this repository, build from the `Dockerfile`, expose port **8080**, and connect the PostgreSQL service (it provides `DATABASE_URL`). Set `AIVEN_CA_CERT_BASE64`, `ANTHROPIC_API_KEY`, `DEMO_ADMIN_PASSWORD_HASH`, `SESSION_SECRET` and `PARTICIPANT_TOKEN_SECRET` as secrets (raw values from the ignored `secrets/aiven-runtime-secrets.txt`). Pushing does not deploy: choose **Deploy latest commit**, then check `/api/health` for the `release` and a configuration summary that never shows values.
 
-`npm run eval` runs the benchmark: a name-only baseline, the structured matcher, and the full flow on synthetic
-cases. Results are written to [docs/RESULTS.md](docs/RESULTS.md). The results are synthetic prototype measurements,
-not real-world performance.
+## Repository map
 
-## Docs
+```
+app/            pages, server actions, /api/health, private image route, public /welcome
+components/     UI: kitchen cards, comparison table, label evidence, AI run steps
+lib/matching/   conservative normalisation and the deterministic matcher
+lib/recalls/    RappelConso adapter and recall scope
+lib/ai/         Anthropic client, label extraction, bounded investigator
+lib/eval/       evaluation arms, metrics and report
+db/migrations/  SQL schema
+fixtures/       saved notice snapshot, evaluation cases and gold labels
+scripts/        migrations, secrets setup, evaluation, demo-video recorder
+docs/           results, demo script, pitch slide, submission material
+```
 
-- [docs/demo-script.md](docs/demo-script.md): 150-second demo with fallback and pre-demo checklist
-- [docs/pitch-slide.md](docs/pitch-slide.md): one-slide pitch
-- [docs/lovable-prompt.md](docs/lovable-prompt.md): UI design prompt and porting plan
+## Limitations and next steps
 
-The demo label images in `public/demo/` are synthetic (`scripts/make-demo-label.py`).
+- Synthetic kitchens and a single replayed notice; the buyer and willingness to pay are unvalidated hypotheses.
+- Barcodes read from photos cannot be confirmed yet (two evaluation misses).
+- No unattended background worker or live recall monitoring; voice contact is deferred.
+- Next: a supervised recall drill on historical deliveries with one multi-site nursery caterer, measuring missed sites, false alerts and time to staff acknowledgment.
+
+More: [demo script](docs/demo-script.md) · [pitch slide content](docs/pitch-slide.md) · [Lovable design prompt](docs/lovable-prompt.md) · [blueprint](Blueprint.md)
